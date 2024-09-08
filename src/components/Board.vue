@@ -1,11 +1,5 @@
 <template>
-  <canvas ref='canvas'
-  class='app-board'
-  width=500
-  height=500
-  @mousemove="onHover"
-  @mouseleave="onMouseLeave"
-  />
+  <canvas ref='canvas' class='app-board' width=500 :height=500 @mousemove="onHover" @mouseleave="onMouseLeave" />
 </template>
 
 <script lang="ts">
@@ -13,7 +7,20 @@ import { defineComponent, PropType } from 'vue'
 import { PinShape, MosaicSize, Matrix, Points, Point } from '../utils/mosaicTypes'
 import { emptyColor, hoverColor } from '@/utils/mosaicColors';
 
-const pinPadding = 2;
+const pinSettings = {
+  round: {
+    padding: 1
+  },
+  square: {
+    padding: 4
+  }
+};
+const sizeSettings = {
+  xs: 5,
+  s: 7,
+  m: 10,
+  l: 12
+}
 
 export default defineComponent({
   name: 'app-board',
@@ -24,7 +31,7 @@ export default defineComponent({
       value: 'round'
     },
     size: {
-      required: false,
+      required: true,
       type: String as PropType<MosaicSize>,
       value: 's'
     }
@@ -38,10 +45,10 @@ export default defineComponent({
       return 500;
     },
     canvasHeight (): number {
-      return 500
+      return 500;
     },
     pinsCount (): number {
-      return 10
+      return sizeSettings[this.size];
     },
     pinsSize (): number {
       return this.canvasWidth / this.pinsCount;
@@ -53,7 +60,7 @@ export default defineComponent({
       for (let i = 0; i < this.pinsCount; ++i) {
         const row: Points = []
         for (let j = 0; j < this.pinsCount; ++j) {
-          row.push([i * size, j * size])
+          row.push([j * size, i * size])
         }
         matrix.push(row)
       }
@@ -85,17 +92,44 @@ export default defineComponent({
       ctx.clearRect(0, 0, this.canvasWidth, this.canvasHeight);
       this.pins.forEach((row: Points, i: number) => {
         row.forEach((cell: Point, j: number) => {
-          const cx = cell[1] + this.pinsSize / 2;
-          const cy = cell[0] + this.pinsSize / 2;
-          ctx.beginPath();
-          ctx.arc(cx, cy, this.pinsSize / 2 - pinPadding, 0, 2 * Math.PI);
-          ctx.fill();
-
+          this.renderPin(cell, ctx);
           if (i === this.selectedRow && j === this.selectedCol) {
             ctx.stroke();
           }
         })
       })
+    },
+    renderPin (point: Point, ctx: CanvasRenderingContext2D) {
+      switch (this.pinShape) {
+        case 'round':
+          this.renderRoundPin(point, ctx);
+          break;
+        case 'square':
+          this.renderSquarePin(point, ctx);
+          break;
+      }
+    },
+    renderRoundPin (point: Point, ctx: CanvasRenderingContext2D) {
+      const cx = point[0] + this.pinsSize / 2;
+      const cy = point[1] + this.pinsSize / 2;
+      const pinPadding = pinSettings.round.padding;
+
+      ctx.beginPath();
+      ctx.arc(cx, cy, this.pinsSize / 2 - pinPadding, 0, 2 * Math.PI);
+      ctx.fill();
+    },
+    renderSquarePin (point: Point, ctx: CanvasRenderingContext2D) {
+      ctx.beginPath();
+      const x = point[0];
+      const y = point[1];
+      const pinPadding = pinSettings.square.padding;
+
+      ctx.moveTo(x + pinPadding, y + pinPadding);
+      ctx.lineTo(x + this.pinsSize - pinPadding, y + pinPadding);
+      ctx.lineTo(x + this.pinsSize - pinPadding, y + this.pinsSize - pinPadding);
+      ctx.lineTo(x + pinPadding, y + this.pinsSize - pinPadding);
+      ctx.closePath();
+      ctx.fill();
     }
   },
   watch: {
@@ -103,6 +137,12 @@ export default defineComponent({
       this.redrawBoard();
     },
     selectedRow () {
+      this.redrawBoard();
+    },
+    pinShape () {
+      this.redrawBoard();
+    },
+    size () {
       this.redrawBoard();
     }
   },
@@ -116,5 +156,6 @@ export default defineComponent({
 <style scoped lang="scss">
 .app-board {
   cursor: pointer;
+  padding: 1rem;
 }
 </style>

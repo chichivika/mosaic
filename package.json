@@ -9,6 +9,7 @@
   },
   "dependencies": {
     "core-js": "^3.8.3",
+    "element-plus": "^2.8.2",
     "vue": "^3.2.13"
   },
   "devDependencies": {
@@ -44,7 +45,7 @@
     },
     "rules": {
       "semi": "off",
-      "no-debugger":"off"
+      "no-debugger": "off"
     }
   },
   "browserslist": [

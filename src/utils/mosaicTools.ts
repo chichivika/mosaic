@@ -14,9 +14,8 @@ export type SizeItem = {
 };
 export type SizeItems = SizeItem[];
 export const sizesCatalog = [
-  { key: 'xs' },
-  { key: 's' },
-  { key: 'm' },
-  { key: 'l' },
-  { key: 'xl' }
+  { key: 'xs', label: 'XS' },
+  { key: 's', label: 'S' },
+  { key: 'm', label: 'M' },
+  { key: 'l', label: 'L' }
 ];
