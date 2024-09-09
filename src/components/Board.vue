@@ -4,22 +4,14 @@
 
 <script lang="ts">
 import { defineComponent, PropType } from 'vue'
-import { PinShape, MosaicSize, Matrix, Points, Point } from '../utils/mosaicTypes'
-import { emptyColor, hoverColor } from '@/utils/mosaicColors';
+import { PinShape, MosaicSize } from '../utils/mosaicTypes'
+import Mosaic from '@/utils/mosaicClass';
 
-const pinSettings = {
-  round: {
-    padding: 1
-  },
-  square: {
-    padding: 4
-  }
-};
 const sizeSettings = {
-  xs: 5,
-  s: 7,
-  m: 10,
-  l: 12
+  xs: 100,
+  s: 60,
+  m: 50,
+  l: 40
 }
 
 export default defineComponent({
@@ -28,12 +20,12 @@ export default defineComponent({
     pinShape: {
       required: false,
       type: String as PropType<PinShape>,
-      value: 'round'
+      default: 'round'
     },
     size: {
-      required: true,
+      required: false,
       type: String as PropType<MosaicSize>,
-      value: 's'
+      default: 'm'
     }
   },
   data: () => ({
@@ -47,24 +39,16 @@ export default defineComponent({
     canvasHeight (): number {
       return 500;
     },
-    pinsCount (): number {
+    pinsSize (): number {
       return sizeSettings[this.size];
     },
-    pinsSize (): number {
-      return this.canvasWidth / this.pinsCount;
-    },
-    pins (): Matrix {
-      const matrix: Matrix = [];
-      const size = this.pinsSize;
-
-      for (let i = 0; i < this.pinsCount; ++i) {
-        const row: Points = []
-        for (let j = 0; j < this.pinsCount; ++j) {
-          row.push([j * size, i * size])
-        }
-        matrix.push(row)
-      }
-      return matrix
+    mosaicObject (): Mosaic {
+      return new Mosaic({
+        width: this.canvasWidth,
+        height: this.canvasHeight,
+        pinShape: this.pinShape,
+        pinSize: this.pinsSize
+      });
     }
   },
   methods: {
@@ -74,8 +58,9 @@ export default defineComponent({
       const mouseX = event.clientX - rect.left;
       const mouseY = event.clientY - rect.top;
 
-      this.selectedCol = Math.trunc(mouseX / this.pinsSize);
-      this.selectedRow = Math.trunc(mouseY / this.pinsSize);
+      const [row, col] = this.mosaicObject.getCellIndsByMouse(mouseX, mouseY);
+      this.selectedCol = col;
+      this.selectedRow = row;
     },
     onMouseLeave () {
       this.selectedCol = -1;
@@ -86,50 +71,11 @@ export default defineComponent({
       const ctx = canvas.getContext('2d');
       if (ctx === null) return;
 
-      ctx.fillStyle = emptyColor;
-      ctx.strokeStyle = hoverColor;
-
-      ctx.clearRect(0, 0, this.canvasWidth, this.canvasHeight);
-      this.pins.forEach((row: Points, i: number) => {
-        row.forEach((cell: Point, j: number) => {
-          this.renderPin(cell, ctx);
-          if (i === this.selectedRow && j === this.selectedCol) {
-            ctx.stroke();
-          }
-        })
-      })
-    },
-    renderPin (point: Point, ctx: CanvasRenderingContext2D) {
-      switch (this.pinShape) {
-        case 'round':
-          this.renderRoundPin(point, ctx);
-          break;
-        case 'square':
-          this.renderSquarePin(point, ctx);
-          break;
-      }
-    },
-    renderRoundPin (point: Point, ctx: CanvasRenderingContext2D) {
-      const cx = point[0] + this.pinsSize / 2;
-      const cy = point[1] + this.pinsSize / 2;
-      const pinPadding = pinSettings.round.padding;
-
-      ctx.beginPath();
-      ctx.arc(cx, cy, this.pinsSize / 2 - pinPadding, 0, 2 * Math.PI);
-      ctx.fill();
-    },
-    renderSquarePin (point: Point, ctx: CanvasRenderingContext2D) {
-      ctx.beginPath();
-      const x = point[0];
-      const y = point[1];
-      const pinPadding = pinSettings.square.padding;
-
-      ctx.moveTo(x + pinPadding, y + pinPadding);
-      ctx.lineTo(x + this.pinsSize - pinPadding, y + pinPadding);
-      ctx.lineTo(x + this.pinsSize - pinPadding, y + this.pinsSize - pinPadding);
-      ctx.lineTo(x + pinPadding, y + this.pinsSize - pinPadding);
-      ctx.closePath();
-      ctx.fill();
+      this.mosaicObject.drawBoard({
+        ctx,
+        selectedCol: this.selectedCol,
+        selectedRow: this.selectedRow
+      });
     }
   },
   watch: {
@@ -156,6 +102,6 @@ export default defineComponent({
 <style scoped lang="scss">
 .app-board {
   cursor: pointer;
-  padding: 1rem;
+  margin: 1rem;
 }
 </style>

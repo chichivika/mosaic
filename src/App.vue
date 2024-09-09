@@ -2,8 +2,8 @@
   <Header />
   <ToolPanel :size="size"
           :shape="shape"
-          @sizeChange="onSizeChange"
-          @shapeChange="onShapeChange"/>
+          @size-change="onSizeChange"
+          @shape-change="onShapeChange"/>
   <Board :pinShape="shape" :size="size"/>
 </template>
 

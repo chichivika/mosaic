@@ -3,7 +3,6 @@
         class="app-select"
         size="large"
         style="width: 100px"
-        @change="onChange"
         >
             <el-option
                 v-for="item in sizesCatalog"
@@ -22,7 +21,6 @@ import { sizesCatalog } from '@/utils/mosaicTools';
 
 export default defineComponent({
   name: 'select-size',
-  emits: ['change'],
   props: {
     value: {
       type: String as PropType<MosaicSize>
@@ -36,11 +34,6 @@ export default defineComponent({
     return {
       sizesCatalog
     };
-  },
-  methods: {
-    onChange (newValue: MosaicSize) {
-      this.$emit('change', newValue);
-    }
   }
 })
 </script>
