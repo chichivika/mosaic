@@ -10,3 +10,8 @@ export type MosaicCell = {
 };
 export type MosaicRow = MosaicCell[];
 export type MosaicGrid = MosaicRow[];
+
+export type PaletteColor = {
+    color: string | null
+};
+export type Palette = PaletteColor[];

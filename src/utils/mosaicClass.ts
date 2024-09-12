@@ -1,6 +1,7 @@
 
 import { Point, PinShape, MosaicGrid, MosaicRow, MosaicCell } from './mosaicTypes';
 import { emptyColor, hoverColor } from './mosaicColors';
+import { drawRoundArc, drawSquareArc } from './drawUtils';
 
 type MosaicParams = {
     width: number,
@@ -100,7 +101,12 @@ export default class Mosaic {
       const cx = point[0] + this._innerPinSize / 2;
       const cy = point[1] + this._innerPinSize / 2;
 
-      ctx.arc(cx, cy, this._innerPinSize / 2, 0, 2 * Math.PI);
+      drawRoundArc({
+        ctx,
+        cx,
+        cy,
+        radius: this._innerPinSize / 2
+      });
     }
 
     protected _drawSquarePin (ctx: CanvasRenderingContext2D, cell: MosaicCell) {
@@ -108,11 +114,12 @@ export default class Mosaic {
       const x = point[0];
       const y = point[1];
 
-      ctx.moveTo(x, y);
-      ctx.lineTo(x + this._innerPinSize, y);
-      ctx.lineTo(x + this._innerPinSize, y + this._innerPinSize);
-      ctx.lineTo(x, y + this._innerPinSize);
-      ctx.closePath();
+      drawSquareArc({
+        ctx,
+        x,
+        y,
+        side: this._innerPinSize
+      });
     }
 
     protected _configGrid () {

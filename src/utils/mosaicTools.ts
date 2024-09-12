@@ -1,4 +1,4 @@
-import { PinShape, MosaicSize } from './mosaicTypes'
+import { PinShape, MosaicSize, Palette } from './mosaicTypes'
 
 export type ShapeItem = {
     key: PinShape
@@ -18,4 +18,15 @@ export const sizesCatalog = [
   { key: 's', label: 'S' },
   { key: 'm', label: 'M' },
   { key: 'l', label: 'L' }
+];
+
+export const palette: Palette = [
+  { color: 'red' },
+  { color: 'orange' },
+  { color: 'yellow' },
+  { color: 'green' },
+  { color: 'blue' },
+  { color: 'violet' },
+  { color: 'white' },
+  { color: 'black' }
 ];

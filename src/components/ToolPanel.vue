@@ -1,5 +1,6 @@
 <template>
     <div class="tool-panel">
+        <PinPicker :pinShape='shape' :palette="[]"/>
         <ShapeSelect :value="shape" @change="onShapeChange"/>
         <SizeSelect :value="size" @change="onSizeChange"/>
     </div>
@@ -9,6 +10,7 @@
 import { defineComponent, PropType } from 'vue'
 import SizeSelect from './SizeSelect.vue';
 import ShapeSelect from './ShapeSelect.vue';
+import PinPicker from './pinPicker/PinPicker.vue';
 import { MosaicSize, PinShape } from '@/utils/mosaicTypes';
 
 export default defineComponent({
@@ -16,11 +18,15 @@ export default defineComponent({
   emits: ['sizeChange', 'shapeChange'],
   props: {
     size: String as PropType<MosaicSize>,
-    shape: String as PropType<PinShape>
+    shape: {
+      type: String as PropType<PinShape>,
+      required: true
+    }
   },
   components: {
     SizeSelect,
-    ShapeSelect
+    ShapeSelect,
+    PinPicker
   },
   methods: {
     onSizeChange (newValue: MosaicSize) {
@@ -37,6 +43,7 @@ export default defineComponent({
         padding: 1rem;
         display: flex;
         justify-content: center;
+        align-items: center;
         & > *{
             margin: 0 2rem;
         }
