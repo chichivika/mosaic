@@ -82,7 +82,7 @@ export default defineComponent({
         cursor: pointer;
       }
       .pin-picker-canvas{
-        margin: 0px 0.8rem;
+        margin: 0px 0.9rem;
       }
       .icon-page {
         color: grey;
