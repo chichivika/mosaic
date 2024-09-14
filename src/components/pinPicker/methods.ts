@@ -3,21 +3,22 @@ import { emptyColor } from '@/utils/mosaicColors';
 import { PinShape } from '@/utils/mosaicTypes';
 import { drawRoundArc, drawSquareArc } from '@/utils/drawUtils';
 
-export function drawPin ({ ctx, pinSize, pinShape }:
+export function drawPin ({ ctx, pinSize, pinShape, color, x }:
     {
         ctx: CanvasRenderingContext2D,
         pinSize: number,
-        pinShape: PinShape
+        pinShape: PinShape,
+        color: string | null,
+        x: number
     }
 ) {
-  ctx.clearRect(0, 0, pinSize, pinSize);
   ctx.beginPath();
-  ctx.fillStyle = emptyColor;
+  ctx.fillStyle = color ?? emptyColor;
   switch (pinShape) {
     case 'round':
       drawRoundArc({
         ctx,
-        cx: pinSize / 2,
+        cx: x + pinSize / 2,
         cy: pinSize / 2,
         radius: pinSize / 2
       });
@@ -25,7 +26,7 @@ export function drawPin ({ ctx, pinSize, pinShape }:
     case 'square':
       drawSquareArc({
         ctx,
-        x: 0,
+        x,
         y: 0,
         side: pinSize
       });

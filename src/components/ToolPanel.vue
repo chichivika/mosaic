@@ -45,7 +45,7 @@ export default defineComponent({
         justify-content: center;
         align-items: center;
         & > *{
-            margin: 0 2rem;
+            margin: 1rem 2rem 0px 2rem;
         }
     }
 </style>

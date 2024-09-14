@@ -1,13 +1,13 @@
 <template>
     <div class="pin-picker">
-        <ElIcon class="icon-page">
+        <ElIcon class="icon-page" @click="onPrevPage">
           <ArrowLeftBold />
         </ElIcon>
         <canvas ref='canvas'
         class='pin-picker-canvas'
         :width='canvasWidth'
         :height='canvasHeight' />
-        <ElIcon class="icon-page">
+        <ElIcon class="icon-page" @click="onNextPage">
           <ArrowRightBold />
         </ElIcon>
     </div>
@@ -49,26 +49,65 @@ export default defineComponent({
     },
     canvasHeight (): number {
       return this.pinSize;
+    },
+    pageCount (): number {
+      return Math.ceil(this.palette.length / this.viewPinCount);
+    },
+    lastPage ():number {
+      return this.pageCount - 1;
+    },
+    enablePrevBtn ():boolean {
+      return this.currPage > 0;
+    },
+    enableNextBtn ():boolean {
+      return this.currPage < this.lastPage;
     }
   },
   methods: {
-    drawPin () {
+    getIndexByPage (page: number) {
+      if (page === this.lastPage) {
+        return this.palette.length - this.viewPinCount;
+      }
+      return page * this.viewPinCount;
+    },
+    drawViewPins () {
       const canvas = this.$refs.canvas as HTMLCanvasElement;
       const ctx = canvas.getContext('2d');
       if (ctx === null) return;
 
-      drawPin({
-        ctx,
-        pinShape: this.pinShape,
-        pinSize: this.pinSize
-      });
+      ctx.clearRect(0, 0, this.canvasWidth, this.canvasHeight);
+      const firstInd = this.getIndexByPage(this.currPage);
+      for (let i = 0; i < this.viewPinCount; ++i) {
+        const paletteInd = firstInd + i;
+        const indentX = i === 0 ? 0 : this.pinIndent;
+        drawPin({
+          ctx,
+          pinShape: this.pinShape,
+          pinSize: this.pinSize,
+          color: this.palette[paletteInd].color,
+          x: i * (this.pinSize + indentX)
+        });
+      }
+    },
+    onPrevPage () {
+      if (this.currPage === 0) return;
+      this.currPage--;
+    },
+    onNextPage () {
+      if (this.currPage === this.lastPage) return;
+      this.currPage++;
+    }
+  },
+  watch: {
+    currPage () {
+      this.drawViewPins();
     }
   },
   updated () {
-    this.drawPin();
+    this.drawViewPins();
   },
   mounted () {
-    this.drawPin();
+    this.drawViewPins();
   }
 })
 </script>

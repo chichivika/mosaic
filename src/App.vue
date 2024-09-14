@@ -48,7 +48,7 @@ export default defineComponent({
   text-align: center;
   color: #2c3e50;
   background-color: colors.$bgColor;
-  padding: 2rem;
+  padding: 1rem;
   box-sizing: border-box;
 }
 :root{
