@@ -7,3 +7,12 @@ body {
     margin: 0px;
     font-family: Roboto, sans-serif;
 }
+
+.MuiList-root.MuiList-padding.MuiMenu-list {
+    padding-top: 0px;
+    padding-bottom: 0px;
+
+    li {
+        justify-content: center;
+    }
+}

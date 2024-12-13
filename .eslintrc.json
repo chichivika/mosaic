@@ -10,7 +10,8 @@
         "airbnb",
         "airbnb-typescript",
         "plugin:import/typescript",
-        "plugin:prettier/recommended"
+        "plugin:prettier/recommended",
+        "prettier"
     ],
     "parser": "@typescript-eslint/parser",
     "parserOptions": {
@@ -23,14 +24,21 @@
     },
     "plugins": [
         "react",
-        "@typescript-eslint",
-        "prettier"
+        "@typescript-eslint"
     ],
     "rules": {
         "max-len": ["error", 100],
         "semi": "error",
         "no-console": "error",
         "quotes": ["error", "single", { "avoidEscape": true }],
+        "@typescript-eslint/quotes": [
+            "error",
+            "single",
+            {
+                "avoidEscape": true,
+                "allowTemplateLiterals": true
+            }
+        ],
         "curly": ["error", "all"],
         "no-underscore-dangle": "off",
         "no-plusplus": "off",
@@ -40,6 +48,10 @@
           "imports": "always-multiline",
           "exports": "always-multiline",
           "functions": "only-multiline"
-        }]
+        }],
+        "react/jsx-props-no-spreading": "off",
+        "@typescript-eslint/naming-convention": "off",
+        "@typescript-eslint/no-use-before-define": "off",
+        "react/require-default-props": "off"
     }
 }
