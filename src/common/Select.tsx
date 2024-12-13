@@ -1,14 +1,25 @@
 import React from 'react';
 import styled from 'styled-components';
 import { Select as UiSelect, SelectProps } from '@mui/material';
+import colors from '../styles/colors';
 
-const StyledUiSelect = styled(UiSelect)`
+type Props = SelectProps & {
+    width?: string;
+};
+
+const StyledUiSelect = styled(UiSelect)<{ $width?: string }>`
+    width: ${(props) => props.$width ?? 'auto'};
+    &.MuiInputBase-root {
+        color: ${colors.fontColor};
+        font-weight: 600;
+    }
     fieldset {
         border: 0px;
     }
-` as typeof UiSelect;
-function Select(props: SelectProps) {
-    return <StyledUiSelect size='small' {...props} />;
+`;
+function Select(props: Props) {
+    const { width, ...uiProps } = props;
+    return <StyledUiSelect size='small' {...uiProps} $width={width} />;
 }
 
 export default Select;

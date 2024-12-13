@@ -5,6 +5,7 @@ import ToolPanel from '../toolPanel/ToolPanel';
 import colors from '../styles/colors';
 
 const StyledAppCnt = styled.div`
+    color: ${colors.fontColor};
     text-align: center;
     background-color: ${colors.bgColor};
     width: 100vw;
