@@ -8,11 +8,13 @@ body {
     font-family: Roboto, sans-serif;
 }
 
-.MuiList-root.MuiList-padding.MuiMenu-list {
-    padding-top: 0px;
-    padding-bottom: 0px;
-
-    li {
-        justify-content: center;
+.MuiMenu-paper {
+    transition-duration: 0.1s !important;
+    .MuiList-root.MuiList-padding.MuiMenu-list {
+        padding-top: 0px;
+        padding-bottom: 0px;
+        li {
+            justify-content: center;
+        }
     }
 }

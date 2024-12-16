@@ -28,12 +28,12 @@ const HeaderCnt = styled.div`
 function AppHeader() {
     return (
         <HeaderCnt>
-            <span className="m">M </span>
-            <span className="o">O </span>
-            <span className="s">S </span>
-            <span className="a">A </span>
-            <span className="i">I </span>
-            <span className="c">C</span>
+            <span className='m'>M </span>
+            <span className='o'>O </span>
+            <span className='s'>S </span>
+            <span className='a'>A </span>
+            <span className='i'>I </span>
+            <span className='c'>C</span>
         </HeaderCnt>
     );
 }

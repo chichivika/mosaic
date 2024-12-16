@@ -1,12 +1,22 @@
 import React from 'react';
+import styled from 'styled-components';
 import { Dispatch } from '@reduxjs/toolkit';
 import { useSelector, useDispatch } from 'react-redux';
 import MenuItem from '../common/MenuItem';
 import Select from '../common/Select';
-import Pin from '../common/Pin';
+import Pin, { StyledPin } from '../common/Pin';
 import { setPinShape, selectPinShape } from '../redux/boardSlice';
 import { PinShape } from '../utils/mosaicTypes';
 
+const StyledMenuItem = styled(MenuItem)`
+    &.MuiMenuItem-root {
+        ${StyledPin} {
+            width: 18px;
+            height: 18px;
+            margin: 3px;
+        }
+    }
+`;
 function ShapeSelect() {
     const dispatch: Dispatch = useDispatch();
     const shapeValue = useSelector(selectPinShape);
@@ -15,12 +25,12 @@ function ShapeSelect() {
             value={shapeValue}
             onChange={(event) => dispatch(setPinShape(event.target.value as PinShape))}
         >
-            <MenuItem value='round'>
+            <StyledMenuItem value='round'>
                 <Pin shape='round' />
-            </MenuItem>
-            <MenuItem value='square'>
+            </StyledMenuItem>
+            <StyledMenuItem value='square'>
                 <Pin shape='square' />
-            </MenuItem>
+            </StyledMenuItem>
         </Select>
     );
 }

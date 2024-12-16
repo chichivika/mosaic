@@ -1,11 +1,11 @@
 import React from 'react';
 import styled from 'styled-components';
-import colors from '../styles/colors';
 import SizeSelect from './SizeSelect';
 import ShapeSelect from './ShapeSelect';
+import PinPicker from '../pinPicker/PinPicker';
 
 const StyledToolsCnt = styled.div`
-    background-color: ${colors.bgColor};
+    background-color: ${(props) => props.theme.bgColor};
     padding: 1rem;
     display: flex;
     justify-content: center;
@@ -18,6 +18,7 @@ const StyledToolsCnt = styled.div`
 function ToolPanel() {
     return (
         <StyledToolsCnt>
+            <PinPicker />
             <ShapeSelect />
             <SizeSelect />
         </StyledToolsCnt>
