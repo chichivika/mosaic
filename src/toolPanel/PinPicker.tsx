@@ -4,7 +4,7 @@ import { useSelector } from 'react-redux';
 import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
 import ChevronRightIcon from '@mui/icons-material/ChevronRight';
 import IconButton from '../common/IconButton';
-import { colorsPalette, emptyColor } from '../utils/mosaicPalette';
+import { colorsPalette } from '../utils/mosaicPalette';
 import { PinShape } from '../utils/mosaicTypes';
 import { drawRoundArc, drawSquareArc } from '../utils/drawUtils';
 import { selectPinShape } from '../redux/boardSlice';
@@ -113,13 +113,13 @@ function _drawPinOnCanvas({
     x,
 }: {
     ctx: CanvasRenderingContext2D;
-    color: string | null;
+    color: string;
     pinSize: number;
     pinShape: PinShape;
     x: number;
 }) {
     ctx.beginPath();
-    ctx.fillStyle = color ?? emptyColor;
+    ctx.fillStyle = color;
     switch (pinShape) {
         case 'square':
             drawSquareArc({

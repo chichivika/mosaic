@@ -2,7 +2,7 @@ import React from 'react';
 import styled from 'styled-components';
 import SizeSelect from './SizeSelect';
 import ShapeSelect from './ShapeSelect';
-import PinPicker from '../pinPicker/PinPicker';
+import PinPicker from './PinPicker';
 
 const StyledToolsCnt = styled.div`
     background-color: ${(props) => props.theme.bgColor};
