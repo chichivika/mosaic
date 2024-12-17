@@ -1,5 +1,5 @@
 import { Point, PinShape, MosaicGrid, MosaicRow, MosaicCell, GridColors } from './mosaicTypes';
-import { emptyColor } from './mosaicPalette';
+import { emptyColor as defaultEmptyColor } from './mosaicPalette';
 import { drawRoundArc, drawSquareArc, LightenDarkenColor } from './drawUtils';
 
 type MosaicParams = {
@@ -11,6 +11,7 @@ type MosaicParams = {
     boardPaddingH: number;
     pinPadding?: number;
     pinsColors?: GridColors | null;
+    emptyColor?: string;
 };
 
 const defaultPinPadding = 0;
@@ -43,6 +44,8 @@ export default class Mosaic {
 
     protected readonly _boardHeight: number;
 
+    protected readonly _emptyColor: string;
+
     protected readonly _grid: MosaicGrid;
 
     protected _outerPinSize: number;
@@ -64,6 +67,7 @@ export default class Mosaic {
         this._boardHeight = this.pinsCountH * this._outerPinSize + 2 * this.boardPaddingH;
 
         this.pinsColors = param.pinsColors || null;
+        this._emptyColor = param.emptyColor || defaultEmptyColor;
 
         this._grid = this._configGrid();
     }
@@ -88,7 +92,7 @@ export default class Mosaic {
         this._clearBoard(ctx);
         this._grid.forEach((row: MosaicRow, i: number) => {
             row.forEach((cell: MosaicCell, j: number) => {
-                const cellColor = cell.color || emptyColor;
+                const cellColor = cell.color || this._emptyColor;
                 ctx.fillStyle = cellColor;
                 ctx.strokeStyle = LightenDarkenColor(cellColor, -20);
 

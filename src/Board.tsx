@@ -11,6 +11,7 @@ type Props = {
     boardPadding?: number;
     pinsColors?: GridColors | null;
     pinPadding?: number;
+    emptyColor?: string;
 };
 export const StyledBoardCnt = styled.div`
     display: flex;
@@ -27,6 +28,7 @@ export default function Board({
     boardPadding = 5,
     pinsColors = null,
     pinPadding = 0,
+    emptyColor,
 }: Props) {
     const boardRef = useRef(null) as RefObject<HTMLCanvasElement>;
 
@@ -42,10 +44,20 @@ export default function Board({
                 pinsCountH,
                 pinsColors,
                 pinPadding,
+                emptyColor,
                 boardPaddingW: boardPadding,
                 boardPaddingH: boardPadding,
             }),
-        [pinShape, pinSize, pinsCountW, pinsCountH, boardPadding, pinsColors, pinPadding],
+        [
+            pinShape,
+            pinSize,
+            pinsCountW,
+            pinsCountH,
+            boardPadding,
+            pinsColors,
+            pinPadding,
+            emptyColor,
+        ],
     );
 
     useEffect(() => {

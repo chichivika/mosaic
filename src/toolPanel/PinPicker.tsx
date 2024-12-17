@@ -43,6 +43,7 @@ function PinPicker({ viewPinsCount = 3, pinSize = 28 }: Props = {}) {
                 pinSize={pinSize}
                 pinPadding={4}
                 pinsColors={[_getPinsToDraw(viewPinsCount, currentPage)]}
+                boardPadding={0}
             />
             <IconButton
                 disabled={currentPage === pagesCount}

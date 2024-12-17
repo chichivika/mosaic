@@ -7,7 +7,7 @@ import Eraser, { StyledEraserCnt } from './Eraser';
 
 const StyledToolsCnt = styled.div`
     background-color: ${(props) => props.theme.bgColor};
-    padding: 1rem;
+    padding-bottom: 1rem;
     display: flex;
     justify-content: center;
     align-items: center;
@@ -19,7 +19,7 @@ const StyledToolsCnt = styled.div`
 const StyledPickerCnt = styled.div`
     display: flex;
     ${StyledEraserCnt} {
-        margin: 10px;
+        margin: 1rem;
     }
 `;
 function ToolPanel() {

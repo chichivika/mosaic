@@ -1,48 +1,18 @@
 import React from 'react';
-import styled from 'styled-components';
 import { PinShape } from '../utils/mosaicTypes';
+import Board from '../Board';
+import colors from '../styles/colors';
 
-export const StyledPin = styled.div<{
-    $radius: string;
-    $color: string;
-    $size?: string;
-    $margin?: string;
-}>`
-    background-color: ${(props) => props.$color};
-    border-radius: ${(props) => props.$radius};
-    width: ${(props) => props.$size};
-    height: ${(props) => props.$size};
-    margin: ${(props) => props.$margin};
-`;
-
-function Pin({
-    shape = 'round',
-    color = 'grey',
-    size = '27px',
-    margin = '',
-}: {
-    shape?: PinShape;
-    color?: string;
-    size?: string;
-    margin?: string;
-}) {
+function Pin({ pinShape = 'round', pinSize = 26 }: { pinShape?: PinShape; pinSize?: number }) {
     return (
-        <StyledPin
-            $radius={_getBorderRadiusByShape(shape)}
-            $color={color}
-            $size={size}
-            $margin={margin}
+        <Board
+            pinsCountH={1}
+            pinsCountW={1}
+            pinShape={pinShape}
+            pinSize={pinSize}
+            emptyColor={colors.fontColor}
         />
     );
-}
-
-function _getBorderRadiusByShape(shape: PinShape) {
-    switch (shape) {
-        case 'round':
-            return '50%';
-        default:
-            return '0%';
-    }
 }
 
 export default Pin;

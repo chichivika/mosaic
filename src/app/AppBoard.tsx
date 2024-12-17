@@ -1,5 +1,4 @@
 import React from 'react';
-import { styled } from 'styled-components';
 import { useSelector } from 'react-redux';
 import { selectPinShape, selectPinSize } from '../redux/boardSlice';
 import Mosaic from '../utils/mosaicClass';
@@ -10,9 +9,6 @@ type Props = {
     availableHeight?: number;
     boardPadding?: number;
 };
-const StyledAppBoard = styled(Board)`
-    margin: 10px;
-`;
 
 export default function AppBoard({
     availableWidth = 700,
@@ -23,7 +19,7 @@ export default function AppBoard({
     const pinSize = useSelector(selectPinSize);
 
     return (
-        <StyledAppBoard
+        <Board
             pinShape={pinShape}
             pinSize={pinSize}
             boardPadding={boardPadding}
