@@ -25,6 +25,7 @@ export default function AppBoard({
             boardPadding={boardPadding}
             pinsCountW={Mosaic.getPinsInLineCount(availableWidth - 2 * boardPadding, pinSize)}
             pinsCountH={Mosaic.getPinsInLineCount(availableHeight - 2 * boardPadding, pinSize)}
+            useSelectedStyle
         />
     );
 }

@@ -12,6 +12,7 @@ type MosaicParams = {
     pinPadding?: number;
     pinsColors?: GridColors | null;
     emptyColor?: string;
+    useSelectedStyle?: boolean;
 };
 
 const defaultPinPadding = 0;
@@ -37,6 +38,8 @@ export default class Mosaic {
     public readonly boardPaddingH: number;
 
     public readonly pinPadding: number;
+
+    public readonly useSelectedStyle: boolean;
 
     public readonly pinsColors: GridColors | null;
 
@@ -68,6 +71,7 @@ export default class Mosaic {
 
         this.pinsColors = param.pinsColors || null;
         this._emptyColor = param.emptyColor || defaultEmptyColor;
+        this.useSelectedStyle = param.useSelectedStyle || false;
 
         this._grid = this._configGrid();
     }
@@ -92,9 +96,10 @@ export default class Mosaic {
         this._clearBoard(ctx);
         this._grid.forEach((row: MosaicRow, i: number) => {
             row.forEach((cell: MosaicCell, j: number) => {
+                ctx.lineWidth = 1;
                 const cellColor = cell.color || this._emptyColor;
                 ctx.fillStyle = cellColor;
-                ctx.strokeStyle = LightenDarkenColor(cellColor, -20);
+                ctx.strokeStyle = LightenDarkenColor(cellColor, -30);
 
                 ctx.beginPath();
                 this._drawPin(ctx, cell);
@@ -104,8 +109,13 @@ export default class Mosaic {
                     ctx.fill();
                 }
 
-                if (cell.color && i === selectedRow && j === selectedCol) {
-                    ctx.stroke();
+                if (this.useSelectedStyle && i === selectedRow && j === selectedCol) {
+                    if (cell.color) {
+                        ctx.stroke();
+                    } else {
+                        ctx.lineWidth = 1.7;
+                        ctx.stroke();
+                    }
                 }
             });
         });

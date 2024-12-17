@@ -5,6 +5,8 @@ const HeaderCnt = styled.div`
     font-size: 2rem;
     padding: 1rem;
     font-weight: bold;
+    user-select: none;
+
     .m {
         color: grey;
     }

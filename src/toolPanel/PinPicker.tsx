@@ -1,12 +1,13 @@
 import React, { useState } from 'react';
 import styled from 'styled-components';
-import { useSelector } from 'react-redux';
+import { Dispatch } from '@reduxjs/toolkit';
+import { useSelector, useDispatch } from 'react-redux';
 import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
 import ChevronRightIcon from '@mui/icons-material/ChevronRight';
 import IconButton from '../common/IconButton';
 import { colorsPalette } from '../utils/mosaicPalette';
 import { PinShape } from '../utils/mosaicTypes';
-import { selectPinShape } from '../redux/boardSlice';
+import { selectPinShape, setDraggedColor } from '../redux/boardSlice';
 import Board from '../Board';
 
 const StyledCnt = styled.div`
@@ -23,6 +24,7 @@ type Props = {
     pinSize?: number;
 };
 function PinPicker({ viewPinsCount = 3, pinSize = 28 }: Props = {}) {
+    const dispatch: Dispatch = useDispatch();
     const [currentPage, setCurrentPage] = useState(1);
 
     const pinShape: PinShape = useSelector(selectPinShape);
@@ -44,6 +46,10 @@ function PinPicker({ viewPinsCount = 3, pinSize = 28 }: Props = {}) {
                 pinPadding={4}
                 pinsColors={[_getPinsToDraw(viewPinsCount, currentPage)]}
                 boardPadding={0}
+                useSelectedStyle
+                onClick={(_row, col) => {
+                    dispatch(setDraggedColor(colorsPalette[col].color));
+                }}
             />
             <IconButton
                 disabled={currentPage === pagesCount}

@@ -1,13 +1,15 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { PinShape, PinSizeAlias } from '../utils/mosaicTypes';
+import { PinShape, PinSizeAlias, PinColor } from '../utils/mosaicTypes';
 
 type BoardStateType = {
     pinShape: PinShape;
     pinSizeAlias: PinSizeAlias;
+    draggedColor: PinColor;
 };
 const initialState: BoardStateType = {
     pinShape: 'round',
     pinSizeAlias: 'm',
+    draggedColor: null,
 };
 
 export const counterSlice = createSlice({
@@ -19,6 +21,9 @@ export const counterSlice = createSlice({
         },
         setPinSizeAlias(state: BoardStateType, action: PayloadAction<PinSizeAlias>) {
             state.pinSizeAlias = action.payload;
+        },
+        setDraggedColor(state: BoardStateType, action: PayloadAction<PinColor>) {
+            state.draggedColor = action.payload;
         },
     },
     selectors: {
@@ -36,9 +41,13 @@ export const counterSlice = createSlice({
             };
             return sizeSettings[state.pinSizeAlias];
         },
+        selectDraggedColor(state: BoardStateType) {
+            return state.draggedColor;
+        },
     },
 });
 
-export const { setPinShape, setPinSizeAlias } = counterSlice.actions;
-export const { selectPinShape, selectPinSize, selectPinSizeAlias } = counterSlice.selectors;
+export const { setPinShape, setPinSizeAlias, setDraggedColor } = counterSlice.actions;
+export const { selectPinShape, selectPinSize, selectPinSizeAlias, selectDraggedColor } =
+    counterSlice.selectors;
 export default counterSlice.reducer;

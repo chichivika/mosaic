@@ -4,6 +4,7 @@ import AppHeader from './AppHeader';
 import ToolPanel from '../toolPanel/ToolPanel';
 import colors from '../styles/colors';
 import AppBoard from './AppBoard';
+import DraggedPin from '../DraggedPin';
 
 const StyledAppCnt = styled.div`
     color: ${(props) => props.theme.fontColor};
@@ -20,6 +21,7 @@ function App() {
                 <AppHeader />
                 <ToolPanel />
                 <AppBoard />
+                <DraggedPin />
             </StyledAppCnt>
         </ThemeProvider>
     );

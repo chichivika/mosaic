@@ -54,6 +54,7 @@
         "@typescript-eslint/no-use-before-define": "off",
         "react/require-default-props": "off",
         "no-param-reassign": "warn",
-        "import/prefer-default-export": "warn"
+        "import/prefer-default-export": "warn",
+        "consistent-return": "off"
     }
 }
