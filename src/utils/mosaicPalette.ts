@@ -12,4 +12,3 @@ export const colorsPalette: Palette = [
     { color: '#474747' },
 ];
 export const emptyColor = '#e8e8e8';
-export const emptyHoverColor = '#d3d1d1';

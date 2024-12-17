@@ -2,9 +2,9 @@ import React from 'react';
 import styled from 'styled-components';
 import { useSelector, useDispatch } from 'react-redux';
 import type { Dispatch } from 'redux';
-import { PinSize } from '../utils/mosaicTypes';
+import { PinSizeAlias } from '../utils/mosaicTypes';
 import MenuItem from '../common/MenuItem';
-import { setPinSize, selectPinSize } from '../redux/boardSlice';
+import { setPinSizeAlias, selectPinSizeAlias } from '../redux/boardSlice';
 import Select from '../common/Select';
 
 const StyledSizeCnt = styled(Select)`
@@ -15,12 +15,12 @@ const StyledSizeCnt = styled(Select)`
 `;
 function SizeSelect() {
     const dispatch: Dispatch = useDispatch();
-    const sizeValue = useSelector(selectPinSize);
+    const sizeAlias = useSelector(selectPinSizeAlias);
     return (
         <StyledSizeCnt
             size='small'
-            value={sizeValue}
-            onChange={(event) => dispatch(setPinSize(event.target.value as PinSize))}
+            value={sizeAlias}
+            onChange={(event) => dispatch(setPinSizeAlias(event.target.value as PinSizeAlias))}
         >
             <MenuItem value='s'>S</MenuItem>
             <MenuItem value='m'>M</MenuItem>

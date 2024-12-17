@@ -2,8 +2,8 @@ import React from 'react';
 import { styled, ThemeProvider } from 'styled-components';
 import AppHeader from './AppHeader';
 import ToolPanel from '../toolPanel/ToolPanel';
-import Board, { StyledBoardCnt } from '../Board';
 import colors from '../styles/colors';
+import AppBoard from './AppBoard';
 
 const StyledAppCnt = styled.div`
     color: ${(props) => props.theme.fontColor};
@@ -11,9 +11,6 @@ const StyledAppCnt = styled.div`
     background-color: ${(props) => props.theme.bgColor};
     width: 100vw;
     height: 100vh;
-    ${StyledBoardCnt} {
-        margin: 10px;
-    }
 `;
 
 function App() {
@@ -22,7 +19,7 @@ function App() {
             <StyledAppCnt>
                 <AppHeader />
                 <ToolPanel />
-                <Board />
+                <AppBoard />
             </StyledAppCnt>
         </ThemeProvider>
     );

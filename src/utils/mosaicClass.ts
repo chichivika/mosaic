@@ -1,56 +1,79 @@
-import { Point, PinShape, MosaicGrid, MosaicRow, MosaicCell } from './mosaicTypes';
-import { emptyColor, emptyHoverColor } from './mosaicPalette';
-import { drawRoundArc, drawSquareArc } from './drawUtils';
+import { Point, PinShape, MosaicGrid, MosaicRow, MosaicCell, GridColors } from './mosaicTypes';
+import { emptyColor } from './mosaicPalette';
+import { drawRoundArc, drawSquareArc, LightenDarkenColor } from './drawUtils';
 
 type MosaicParams = {
-    width: number;
-    height: number;
+    pinsCountW: number;
+    pinsCountH: number;
     pinSize: number;
     pinShape: PinShape;
+    boardPaddingW: number;
+    boardPaddingH: number;
+    pinPadding?: number;
+    pinsColors?: GridColors | null;
 };
 
+const defaultPinPadding = 0;
 export default class Mosaic {
-    static minCountW: 1;
+    static getPinsInLineCount(
+        lineWidth: number,
+        pinSize: number,
+        pinPadding: number = defaultPinPadding,
+    ) {
+        return Math.floor(lineWidth / (pinSize + 2 * pinPadding));
+    }
 
-    static minCountH: 1;
+    public readonly pinsCountW: number;
 
-    static settingsByShape = {
-        round: {
-            padding: 1,
-        },
-        square: {
-            padding: 3,
-        },
-    };
-
-    public readonly width: number;
-
-    public readonly height: number;
+    public readonly pinsCountH: number;
 
     public readonly pinSize: number;
 
     public readonly pinShape: PinShape;
 
+    public readonly boardPaddingW: number;
+
+    public readonly boardPaddingH: number;
+
+    public readonly pinPadding: number;
+
+    public readonly pinsColors: GridColors | null;
+
+    protected readonly _boardWidth: number;
+
+    protected readonly _boardHeight: number;
+
     protected readonly _grid: MosaicGrid;
 
-    protected _paddingW = 0;
-
-    protected _paddingH = 0;
-
-    protected _pinPadding: number;
-
-    protected _innerPinSize: number;
+    protected _outerPinSize: number;
 
     constructor(param: MosaicParams) {
-        this.width = param.width;
-        this.height = param.height;
+        this.pinsCountW = param.pinsCountW;
+        this.pinsCountH = param.pinsCountH;
+
+        this.boardPaddingW = param.boardPaddingW;
+        this.boardPaddingH = param.boardPaddingH;
+
         this.pinSize = param.pinSize;
         this.pinShape = param.pinShape;
 
-        this._pinPadding = Mosaic.settingsByShape[this.pinShape].padding;
-        this._innerPinSize = this.pinSize - 2 * this._pinPadding;
+        this.pinPadding = param.pinPadding ?? defaultPinPadding;
+        this._outerPinSize = this.pinSize + 2 * this.pinPadding;
+
+        this._boardWidth = this.pinsCountW * this._outerPinSize + 2 * this.boardPaddingW;
+        this._boardHeight = this.pinsCountH * this._outerPinSize + 2 * this.boardPaddingH;
+
+        this.pinsColors = param.pinsColors || null;
 
         this._grid = this._configGrid();
+    }
+
+    public getBoardWidth() {
+        return this._boardWidth;
+    }
+
+    public getBoardHeight() {
+        return this._boardHeight;
     }
 
     public drawBoard({
@@ -62,17 +85,22 @@ export default class Mosaic {
         selectedCol: number;
         selectedRow: number;
     }) {
-        ctx.fillStyle = emptyColor;
-        ctx.strokeStyle = emptyHoverColor;
-
-        ctx.clearRect(0, 0, this.width, this.height);
+        this._clearBoard(ctx);
         this._grid.forEach((row: MosaicRow, i: number) => {
             row.forEach((cell: MosaicCell, j: number) => {
+                const cellColor = cell.color || emptyColor;
+                ctx.fillStyle = cellColor;
+                ctx.strokeStyle = LightenDarkenColor(cellColor, -20);
+
                 ctx.beginPath();
                 this._drawPin(ctx, cell);
-                ctx.fill();
+                if (!cell.color) {
+                    ctx.stroke();
+                } else {
+                    ctx.fill();
+                }
 
-                if (i === selectedRow && j === selectedCol) {
+                if (cell.color && i === selectedRow && j === selectedCol) {
                     ctx.stroke();
                 }
             });
@@ -83,14 +111,20 @@ export default class Mosaic {
         let row = -1;
         let col = -1;
 
-        if (x >= this._paddingW && x <= this.width - this._paddingW) {
-            col = Math.trunc((x - this._paddingW) / this.pinSize);
+        const { boardPaddingW, boardPaddingH } = this;
+
+        if (x >= boardPaddingW && x <= this._boardWidth - boardPaddingW) {
+            col = Math.trunc((x - boardPaddingW) / this._outerPinSize);
         }
-        if (y >= this._paddingH && y <= this.height - this._paddingH) {
-            row = Math.trunc((y - this._paddingH) / this.pinSize);
+        if (y >= boardPaddingH && y <= this._boardHeight - boardPaddingH) {
+            row = Math.trunc((y - boardPaddingH) / this._outerPinSize);
         }
 
         return [row, col];
+    }
+
+    protected _clearBoard(ctx: CanvasRenderingContext2D) {
+        ctx.clearRect(0, 0, this._boardWidth, this._boardHeight);
     }
 
     protected _drawPin(ctx: CanvasRenderingContext2D, cell: MosaicCell) {
@@ -105,14 +139,14 @@ export default class Mosaic {
 
     protected _drawRoundPin(ctx: CanvasRenderingContext2D, cell: MosaicCell) {
         const { point } = cell;
-        const cx = point[0] + this._innerPinSize / 2;
-        const cy = point[1] + this._innerPinSize / 2;
+        const cx = point[0] + this.pinSize / 2;
+        const cy = point[1] + this.pinSize / 2;
 
         drawRoundArc({
             ctx,
             cx,
             cy,
-            radius: this._innerPinSize / 2,
+            radius: this.pinSize / 2,
         });
     }
 
@@ -125,40 +159,27 @@ export default class Mosaic {
             ctx,
             x,
             y,
-            side: this._innerPinSize,
+            side: this.pinSize,
         });
     }
 
     protected _configGrid() {
-        let pinsCountW = Math.floor(this.width / this.pinSize);
-        let paddingW = 0;
-        if (pinsCountW < Mosaic.minCountW) {
-            pinsCountW = Mosaic.minCountW;
-        } else {
-            paddingW = (this.width - pinsCountW * this.pinSize) / 2;
-        }
-        this._paddingW = paddingW;
-
-        let pinsCountH = Math.floor(this.height / this.pinSize);
-        let paddingH = 0;
-        if (pinsCountH < Mosaic.minCountH) {
-            pinsCountH = Mosaic.minCountH;
-        } else {
-            paddingH = (this.height - pinsCountH * this.pinSize) / 2;
-        }
-        this._paddingH = paddingH;
+        const { pinsCountW, pinsCountH, boardPaddingW, boardPaddingH, pinsColors, pinPadding } =
+            this;
 
         const grid: MosaicGrid = [];
-        const pinPadding = Mosaic.settingsByShape[this.pinShape].padding;
         for (let i = 0; i < pinsCountH; ++i) {
             const row: MosaicRow = [];
-            for (let j = 0; j < pinsCountW; ++j) {
-                const x = paddingW + pinPadding + j * this.pinSize;
-                const y = paddingH + pinPadding + i * this.pinSize;
+            const y = boardPaddingH + i * this._outerPinSize;
 
+            for (let j = 0; j < pinsCountW; ++j) {
+                const x = boardPaddingW + j * this._outerPinSize;
+
+                const color = pinsColors?.[i]?.[j]?.color || null;
                 const cell: MosaicCell = {
-                    point: [x, y],
-                    color: null,
+                    color,
+                    outerPoint: [x, y],
+                    point: [x + pinPadding, y + pinPadding],
                 };
                 row.push(cell);
             }

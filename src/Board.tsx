@@ -1,28 +1,33 @@
 import React, { useEffect, useRef, useMemo, useState, RefObject, MouseEvent } from 'react';
 import styled from 'styled-components';
-import { useSelector } from 'react-redux';
-import { selectPinShape, selectPinSize } from './redux/boardSlice';
 import Mosaic from './utils/mosaicClass';
+import { PinShape, GridColors } from './utils/mosaicTypes';
 
 type Props = {
-    width?: number;
-    height?: number;
-};
-const sizeSettings = {
-    s: 24,
-    m: 30,
-    l: 45,
+    pinsCountW: number;
+    pinsCountH: number;
+    pinSize: number;
+    pinShape: PinShape;
+    boardPadding?: number;
+    pinsColors?: GridColors | null;
+    pinPadding?: number;
 };
 export const StyledBoardCnt = styled.div`
     display: flex;
     justify-content: center;
+    canvas {
+        cursor: pointer;
+    }
 `;
-export default function Board({ width = 700, height = 500 }: Props) {
-    const canvasWidth = Math.max(width, 150);
-    const canvasHeight = Math.max(height, 150);
-
-    const pinSize = useSelector(selectPinSize);
-    const pinShape = useSelector(selectPinShape);
+export default function Board({
+    pinsCountW,
+    pinsCountH,
+    pinSize,
+    pinShape,
+    boardPadding = 5,
+    pinsColors = null,
+    pinPadding = 0,
+}: Props) {
     const boardRef = useRef(null) as RefObject<HTMLCanvasElement>;
 
     const [selectedRow, setSelectedRow] = useState(-1);
@@ -31,12 +36,16 @@ export default function Board({ width = 700, height = 500 }: Props) {
     const mosaic = useMemo(
         () =>
             new Mosaic({
-                width,
-                height,
                 pinShape,
-                pinSize: sizeSettings[pinSize],
+                pinSize,
+                pinsCountW,
+                pinsCountH,
+                pinsColors,
+                pinPadding,
+                boardPaddingW: boardPadding,
+                boardPaddingH: boardPadding,
             }),
-        [width, height, pinSize, pinShape],
+        [pinShape, pinSize, pinsCountW, pinsCountH, boardPadding, pinsColors, pinPadding],
     );
 
     useEffect(() => {
@@ -59,18 +68,18 @@ export default function Board({ width = 700, height = 500 }: Props) {
         <StyledBoardCnt>
             <canvas
                 ref={boardRef}
-                width={canvasWidth}
-                height={canvasHeight}
+                width={mosaic.getBoardWidth()}
+                height={mosaic.getBoardHeight()}
                 onMouseMove={(event) =>
-                    calculateSelectedCell(event, mosaic, setSelectedRow, setSelectedCol)
+                    _calculateSelectedCell(event, mosaic, setSelectedRow, setSelectedCol)
                 }
-                onMouseLeave={() => clearSelectedCell(setSelectedRow, setSelectedCol)}
+                onMouseLeave={() => _clearSelectedCell(setSelectedRow, setSelectedCol)}
             />
         </StyledBoardCnt>
     );
 }
 
-function calculateSelectedCell(
+function _calculateSelectedCell(
     event: MouseEvent,
     mosaic: Mosaic,
     setSelectedRow: React.Dispatch<React.SetStateAction<number>>,
@@ -85,7 +94,7 @@ function calculateSelectedCell(
     setSelectedCol(col);
     setSelectedRow(row);
 }
-function clearSelectedCell(
+function _clearSelectedCell(
     setSelectedRow: React.Dispatch<React.SetStateAction<number>>,
     setSelectedCol: React.Dispatch<React.SetStateAction<number>>,
 ) {
