@@ -1,3 +1,5 @@
+import { Points } from './mosaicTypes';
+
 export function drawRoundArc({
     ctx,
     cx,
@@ -28,6 +30,29 @@ export function drawSquareArc({
     ctx.lineTo(x + side, y + side);
     ctx.lineTo(x, y + side);
     ctx.closePath();
+}
+
+export function drawRectangle({ ctx, verts }: { ctx: CanvasRenderingContext2D; verts: Points }) {
+    if (verts.length === 0) {
+        return;
+    }
+
+    drawLines({ ctx, verts });
+    ctx.closePath();
+}
+
+export function drawLines({ ctx, verts }: { ctx: CanvasRenderingContext2D; verts: Points }) {
+    if (verts.length === 0) {
+        return;
+    }
+
+    verts.forEach((vert, index) => {
+        if (index === 0) {
+            ctx.moveTo(vert[0], vert[1]);
+            return;
+        }
+        ctx.lineTo(vert[0], vert[1]);
+    });
 }
 
 export function LightenDarkenColor(color: string, amt: number) {
