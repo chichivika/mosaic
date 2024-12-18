@@ -2,7 +2,7 @@ import React, { MouseEvent } from 'react';
 import styled from 'styled-components';
 import { Dispatch } from '@reduxjs/toolkit';
 import { useDispatch } from 'react-redux';
-import { setDragObject } from '../redux/dndSlice';
+import { initDragObject } from '../redux/dndSlice';
 import Eraser from '../common/Eraser';
 
 export const StyledEraserPicker = styled.div`
@@ -15,13 +15,11 @@ export default function EraserPicker() {
         <StyledEraserPicker
             onClick={(event: MouseEvent) => {
                 dispatch(
-                    setDragObject({
+                    initDragObject({
                         draggedType: 'eraser',
                         draggedColor: null,
                         dragStartMouseX: event.clientX,
                         dragStartMouseY: event.clientY,
-                        mouseX: event.clientX,
-                        mouseY: event.clientY,
                     }),
                 );
             }}

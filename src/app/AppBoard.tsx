@@ -1,31 +1,41 @@
-import React from 'react';
-import { useSelector } from 'react-redux';
-import { selectPinShape, selectPinSize } from '../redux/boardSlice';
-import Mosaic from '../utils/mosaicClass';
-import Board from '../Board';
+import React, { useEffect } from 'react';
+import { Dispatch } from '@reduxjs/toolkit';
+import { useSelector, useDispatch } from 'react-redux';
+import {
+    selectPinShape,
+    selectPinSize,
+    setSelectedCell,
+    selectPinsCountW,
+    selectPinsCountH,
+    selectPinsColors,
+    boardPadding,
+    initPinsColors,
+} from '../redux/boardSlice';
+import HoverBoard from '../HoverBoard';
 
-type Props = {
-    availableWidth?: number;
-    availableHeight?: number;
-    boardPadding?: number;
-};
-
-export default function AppBoard({
-    availableWidth = 700,
-    availableHeight = 500,
-    boardPadding = 5,
-}: Props) {
+export default function AppBoard() {
+    const dispatch: Dispatch = useDispatch();
     const pinShape = useSelector(selectPinShape);
     const pinSize = useSelector(selectPinSize);
+    const pinsCountW = useSelector(selectPinsCountW);
+    const pinsCountH = useSelector(selectPinsCountH);
+
+    useEffect(() => {
+        dispatch(initPinsColors({ pinsCountW, pinsCountH }));
+    }, [pinsCountW, pinsCountH]);
 
     return (
-        <Board
+        <HoverBoard
+            concernsForDND
             pinShape={pinShape}
             pinSize={pinSize}
             boardPadding={boardPadding}
-            pinsCountW={Mosaic.getPinsInLineCount(availableWidth - 2 * boardPadding, pinSize)}
-            pinsCountH={Mosaic.getPinsInLineCount(availableHeight - 2 * boardPadding, pinSize)}
-            useSelectedStyle
+            pinsCountW={pinsCountW}
+            pinsCountH={pinsCountH}
+            pinsColors={useSelector(selectPinsColors)}
+            onSelectedCellChange={(cellInds) => {
+                dispatch(setSelectedCell(cellInds));
+            }}
         />
     );
 }

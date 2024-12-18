@@ -1,8 +1,8 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { PinColor } from '../utils/mosaicTypes';
+import { PinColor, DraggedType } from '../utils/mosaicTypes';
 
 type DNDStateType = {
-    draggedType: 'pin' | 'eraser' | null;
+    draggedType: DraggedType;
     draggedColor: PinColor;
     dragStartMouseX: number;
     dragStartMouseY: number;
@@ -22,7 +22,22 @@ export const dndSlice = createSlice({
     name: 'dnd',
     initialState,
     reducers: {
-        setDragObject(state: DNDStateType, action: PayloadAction<DNDStateType>) {
+        initDragObject(
+            state: DNDStateType,
+            action: PayloadAction<{
+                draggedType: DraggedType;
+                draggedColor: PinColor;
+                dragStartMouseX: number;
+                dragStartMouseY: number;
+            }>,
+        ) {
+            Object.assign(state, action.payload);
+        },
+
+        setMousePosition(
+            state: DNDStateType,
+            action: PayloadAction<{ mouseX: number; mouseY: number }>,
+        ) {
             Object.assign(state, action.payload);
         },
 
@@ -52,7 +67,7 @@ export const dndSlice = createSlice({
     },
 });
 
-export const { setDragObject, clearDragObject } = dndSlice.actions;
+export const { initDragObject, setMousePosition, clearDragObject } = dndSlice.actions;
 export const {
     selectDraggedType,
     selectDraggedColor,

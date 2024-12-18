@@ -12,7 +12,7 @@ export type BoardClickEventObject = {
     mouseY: number;
 };
 export type BoardClickCallback = (param: BoardClickEventObject) => void;
-type Props = {
+export type GeneralBoardProps = {
     pinsCountW: number;
     pinsCountH: number;
     pinSize: number;
@@ -21,8 +21,14 @@ type Props = {
     pinsColors?: GridColors | null;
     pinPadding?: number;
     emptyColor?: string;
-    useSelectedStyle?: boolean;
     onClick?: BoardClickCallback;
+    onSelectedCellChange?: (indicies: [rowIndex: number, colIndex: number]) => void;
+};
+type BoardProps = GeneralBoardProps & {
+    mouseX?: number | null;
+    mouseY?: number | null;
+    onMouseMove?: (event: MouseEvent) => void;
+    onMouseLeave?: (event: MouseEvent) => void;
 };
 export const StyledBoardCnt = styled.div`
     display: flex;
@@ -40,11 +46,14 @@ export default function Board({
     pinsColors = null,
     pinPadding = 0,
     emptyColor,
-    useSelectedStyle = false,
+    mouseX = null,
+    mouseY = null,
     onClick,
-}: Props) {
+    onMouseMove,
+    onMouseLeave,
+    onSelectedCellChange,
+}: BoardProps) {
     const boardRef = useRef(null) as RefObject<HTMLCanvasElement>;
-
     const [selectedRow, setSelectedRow] = useState(-1);
     const [selectedCol, setSelectedCol] = useState(-1);
 
@@ -58,7 +67,6 @@ export default function Board({
                 pinsColors,
                 pinPadding,
                 emptyColor,
-                useSelectedStyle,
                 boardPaddingW: boardPadding,
                 boardPaddingH: boardPadding,
             }),
@@ -70,16 +78,35 @@ export default function Board({
             boardPadding,
             pinsColors,
             pinPadding,
-            useSelectedStyle,
             emptyColor,
         ],
     );
 
     useEffect(() => {
-        if (!boardRef.current) {
+        const canvas = boardRef.current;
+        if (!canvas) {
             return;
         }
-        const ctx = boardRef.current.getContext('2d');
+        const [row, col] = _calculateSelectedCell({
+            mouseX,
+            mouseY,
+            mosaic,
+            canvas,
+        });
+        setSelectedRow(row);
+        setSelectedCol(col);
+    }, [boardRef, mouseX, mouseY, mosaic]);
+
+    useEffect(() => {
+        onSelectedCellChange?.([selectedRow, selectedCol]);
+    }, [selectedRow, selectedCol, onSelectedCellChange]);
+
+    useEffect(() => {
+        const canvas = boardRef.current;
+        if (!canvas) {
+            return;
+        }
+        const ctx = canvas.getContext('2d');
         if (ctx === null) {
             return;
         }
@@ -98,43 +125,36 @@ export default function Board({
                 width={mosaic.getBoardWidth()}
                 height={mosaic.getBoardHeight()}
                 onClick={onClick ? (event) => _fireClickEvent(event, mosaic, onClick) : undefined}
-                onMouseMove={
-                    useSelectedStyle
-                        ? (event) =>
-                              _calculateSelectedCell(event, mosaic, setSelectedRow, setSelectedCol)
-                        : undefined
-                }
-                onMouseLeave={
-                    useSelectedStyle
-                        ? () => _clearSelectedCell(setSelectedRow, setSelectedCol)
-                        : undefined
-                }
+                onMouseMove={onMouseMove}
+                onMouseLeave={onMouseLeave}
             />
         </StyledBoardCnt>
     );
 }
 
-function _calculateSelectedCell(
-    event: MouseEvent,
-    mosaic: Mosaic,
-    setSelectedRow: React.Dispatch<React.SetStateAction<number>>,
-    setSelectedCol: React.Dispatch<React.SetStateAction<number>>,
-) {
-    const canvas = event.target as HTMLCanvasElement;
+function _calculateSelectedCell({
+    mouseX,
+    mouseY,
+    mosaic,
+    canvas,
+}: {
+    mouseX: number | null;
+    mouseY: number | null;
+    mosaic: Mosaic;
+    canvas: HTMLCanvasElement;
+}) {
+    const emptySelection = [-1, -1];
+    if (mouseX === null || mouseY === null) {
+        return emptySelection;
+    }
     const rect = canvas.getBoundingClientRect();
-    const mouseX = event.clientX - rect.left;
-    const mouseY = event.clientY - rect.top;
-
-    const [row, col] = mosaic.getCellIndsByMouse(mouseX, mouseY);
-    setSelectedCol(col);
-    setSelectedRow(row);
-}
-function _clearSelectedCell(
-    setSelectedRow: React.Dispatch<React.SetStateAction<number>>,
-    setSelectedCol: React.Dispatch<React.SetStateAction<number>>,
-) {
-    setSelectedCol(-1);
-    setSelectedRow(-1);
+    if (mouseX < rect.left || mouseX > rect.right) {
+        return emptySelection;
+    }
+    if (mouseY < rect.top || mouseY > rect.bottom) {
+        return emptySelection;
+    }
+    return mosaic.getCellIndsByMouse(mouseX - rect.left, mouseY - rect.top);
 }
 
 function _fireClickEvent(event: MouseEvent, mosaic: Mosaic, onClick: BoardClickCallback) {

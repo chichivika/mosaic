@@ -8,8 +8,9 @@ import IconButton from '../common/IconButton';
 import { colorsPalette } from '../utils/mosaicPalette';
 import { PinShape, Palette } from '../utils/mosaicTypes';
 import { selectPinShape } from '../redux/boardSlice';
-import { setDragObject } from '../redux/dndSlice';
-import Board, { BoardClickEventObject } from '../Board';
+import { initDragObject } from '../redux/dndSlice';
+import { BoardClickEventObject } from '../Board';
+import HoverBoard from '../HoverBoard';
 
 const StyledCnt = styled.div`
     background-color: inherit;
@@ -40,7 +41,7 @@ function PinPicker({ viewPinsCount = 3, pinSize = 28 }: Props = {}) {
             >
                 <ChevronLeftIcon />
             </IconButton>
-            <Board
+            <HoverBoard
                 pinsCountW={viewPinsCount}
                 pinsCountH={1}
                 pinShape={pinShape}
@@ -48,7 +49,6 @@ function PinPicker({ viewPinsCount = 3, pinSize = 28 }: Props = {}) {
                 pinPadding={4}
                 pinsColors={[pinsToDraw]}
                 boardPadding={0}
-                useSelectedStyle
                 onClick={(param: BoardClickEventObject) => {
                     _startDragEvent({
                         eventParam: param,
@@ -77,13 +77,11 @@ function _startDragEvent({
     dispatch: Dispatch;
 }) {
     dispatch(
-        setDragObject({
+        initDragObject({
             draggedType: 'pin',
             draggedColor: pinsToDraw[eventParam.colIndex].color,
             dragStartMouseX: eventParam.mouseX,
             dragStartMouseY: eventParam.mouseY,
-            mouseX: eventParam.mouseX,
-            mouseY: eventParam.mouseY,
         }),
     );
 }

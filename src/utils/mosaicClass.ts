@@ -1,6 +1,6 @@
 import { Point, PinShape, MosaicGrid, MosaicRow, MosaicCell, GridColors } from './mosaicTypes';
 import { emptyColor as defaultEmptyColor } from './mosaicPalette';
-import { drawRoundArc, drawSquareArc, LightenDarkenColor } from './drawUtils';
+import { drawRoundArc, drawSquareArc, drawLines, LightenDarkenColor } from './drawUtils';
 
 type MosaicParams = {
     pinsCountW: number;
@@ -12,7 +12,6 @@ type MosaicParams = {
     pinPadding?: number;
     pinsColors?: GridColors | null;
     emptyColor?: string;
-    useSelectedStyle?: boolean;
 };
 
 const defaultPinPadding = 0;
@@ -38,8 +37,6 @@ export default class Mosaic {
     public readonly boardPaddingH: number;
 
     public readonly pinPadding: number;
-
-    public readonly useSelectedStyle: boolean;
 
     public readonly pinsColors: GridColors | null;
 
@@ -71,7 +68,6 @@ export default class Mosaic {
 
         this.pinsColors = param.pinsColors || null;
         this._emptyColor = param.emptyColor || defaultEmptyColor;
-        this.useSelectedStyle = param.useSelectedStyle || false;
 
         this._grid = this._configGrid();
     }
@@ -99,23 +95,25 @@ export default class Mosaic {
                 ctx.lineWidth = 1;
                 const cellColor = cell.color || this._emptyColor;
                 ctx.fillStyle = cellColor;
-                ctx.strokeStyle = LightenDarkenColor(cellColor, -30);
+                ctx.strokeStyle = cellColor;
+                const isCellSelected = i === selectedRow && j === selectedCol;
 
                 ctx.beginPath();
-                this._drawPin(ctx, cell);
-                if (!cell.color) {
+                this._drawPin(ctx, cell, i, j, isCellSelected);
+                if (!cell.color && !isCellSelected) {
                     ctx.stroke();
-                } else {
+                } else if (cell.color) {
                     ctx.fill();
                 }
 
-                if (this.useSelectedStyle && i === selectedRow && j === selectedCol) {
-                    if (cell.color) {
-                        ctx.stroke();
-                    } else {
-                        ctx.lineWidth = 1.7;
-                        ctx.stroke();
+                if (isCellSelected) {
+                    ctx.strokeStyle = LightenDarkenColor(cellColor, -40);
+                    if (!cell.color) {
+                        ctx.fillStyle = '#e9e9e9';
+                        ctx.lineWidth = 1.5;
+                        ctx.fill();
                     }
+                    ctx.stroke();
                 }
             });
         });
@@ -141,10 +139,16 @@ export default class Mosaic {
         ctx.clearRect(0, 0, this._boardWidth, this._boardHeight);
     }
 
-    protected _drawPin(ctx: CanvasRenderingContext2D, cell: MosaicCell) {
+    protected _drawPin(
+        ctx: CanvasRenderingContext2D,
+        cell: MosaicCell,
+        i: number,
+        j: number,
+        isSelected: boolean,
+    ) {
         switch (this.pinShape) {
             case 'square':
-                this._drawSquarePin(ctx, cell);
+                this._drawSquarePin(ctx, cell, i, j, isSelected);
                 break;
             default:
                 this._drawRoundPin(ctx, cell);
@@ -164,17 +168,41 @@ export default class Mosaic {
         });
     }
 
-    protected _drawSquarePin(ctx: CanvasRenderingContext2D, cell: MosaicCell) {
+    protected _drawSquarePin(
+        ctx: CanvasRenderingContext2D,
+        cell: MosaicCell,
+        i: number,
+        j: number,
+        isSelected: boolean,
+    ) {
         const { point } = cell;
         const x = point[0];
         const y = point[1];
 
-        drawSquareArc({
-            ctx,
-            x,
-            y,
-            side: this.pinSize,
-        });
+        const leftTop = [x, y] as Point;
+        const rightTop = [x + this.pinSize, y] as Point;
+        const leftBottom = [x, y + this.pinSize] as Point;
+        const rightBottom = [x + this.pinSize, y + this.pinSize] as Point;
+
+        if (isSelected || (i === 0 && j === 0)) {
+            drawSquareArc({
+                ctx,
+                x,
+                y,
+                side: this.pinSize,
+            });
+            return;
+        }
+        if (i === 0) {
+            drawLines({ ctx, verts: [leftTop, rightTop, rightBottom, leftBottom] });
+            return;
+        }
+        if (j === 0) {
+            drawLines({ ctx, verts: [leftTop, leftBottom, rightBottom, rightTop] });
+            return;
+        }
+
+        drawLines({ ctx, verts: [leftBottom, rightBottom, rightTop] });
     }
 
     protected _configGrid() {

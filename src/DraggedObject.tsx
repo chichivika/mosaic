@@ -2,12 +2,13 @@ import React, { useEffect, useRef, RefObject } from 'react';
 import { Dispatch } from '@reduxjs/toolkit';
 import styled from 'styled-components';
 import { useSelector, useDispatch } from 'react-redux';
-import { selectPinShape, selectPinSize } from './redux/boardSlice';
+import { selectPinShape, selectPinSize, setPinColor } from './redux/boardSlice';
 import {
     selectDraggedColor,
     selectDraggedType,
     selectDragStartMouseX,
     selectDragStartMouseY,
+    setMousePosition,
     clearDragObject,
 } from './redux/dndSlice';
 import Pin from './common/Pin';
@@ -51,6 +52,13 @@ export default function DraggedObject() {
         );
         pinCnt.style.left = `${positionLeft}px`;
         pinCnt.style.top = `${positionTop}px`;
+
+        dispatch(
+            setMousePosition({
+                mouseX: event.clientX,
+                mouseY: event.clientY,
+            }),
+        );
     };
 
     useEffect(() => {
@@ -87,6 +95,13 @@ export default function DraggedObject() {
             onContextMenu={(event) => {
                 event.preventDefault();
                 clearDraggedObject();
+            }}
+            onClick={() => {
+                dispatch(
+                    setPinColor({
+                        color: pinColor,
+                    }),
+                );
             }}
         >
             {objectToDrag}
