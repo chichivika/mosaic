@@ -3,9 +3,22 @@
     src: url(../public/fonts/Roboto-Regular.ttf);
 }
 
+:root {
+    width: 100%;
+    height: 100%;
+    background-color: #f9f9f9;
+}
+
+#root {
+    width: 100%;
+    height: 100%;
+}
+
 body {
     margin: 0px;
     font-family: Roboto, sans-serif;
+    width: 100%;
+    height: 100%;
 }
 
 .MuiMenu-paper {

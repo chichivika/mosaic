@@ -5,20 +5,32 @@ import {
     selectPinShape,
     selectPinSize,
     setSelectedCell,
-    selectPinsCountW,
-    selectPinsCountH,
     selectPinsColors,
-    boardPadding,
     initPinsColors,
 } from '../redux/boardSlice';
 import HoverBoard from '../HoverBoard';
+import Mosaic from '../utils/mosaicClass';
+
+const availableWidth = 1000;
+const availableHeight = 600;
+const boardPadding = 5;
 
 export default function AppBoard() {
     const dispatch: Dispatch = useDispatch();
     const pinShape = useSelector(selectPinShape);
     const pinSize = useSelector(selectPinSize);
-    const pinsCountW = useSelector(selectPinsCountW);
-    const pinsCountH = useSelector(selectPinsCountH);
+    const pinPadding = 2;
+
+    const pinsCountW = Mosaic.getPinsInLineCount(
+        availableWidth - 2 * boardPadding,
+        pinSize,
+        pinPadding,
+    );
+    const pinsCountH = Mosaic.getPinsInLineCount(
+        availableHeight - 2 * boardPadding,
+        pinSize,
+        pinPadding,
+    );
 
     useEffect(() => {
         dispatch(initPinsColors({ pinsCountW, pinsCountH }));
@@ -32,6 +44,7 @@ export default function AppBoard() {
             boardPadding={boardPadding}
             pinsCountW={pinsCountW}
             pinsCountH={pinsCountH}
+            pinPadding={pinPadding}
             pinsColors={useSelector(selectPinsColors)}
             onSelectedCellChange={(cellInds) => {
                 dispatch(setSelectedCell(cellInds));

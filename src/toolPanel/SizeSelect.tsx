@@ -8,7 +8,7 @@ import { setPinSizeAlias, selectPinSizeAlias } from '../redux/boardSlice';
 import Select from '../common/Select';
 
 const StyledSizeCnt = styled(Select)`
-    width: 65px;
+    width: 72px;
     &.MuiInputBase-root {
         font-size: 1.3rem;
     }
@@ -22,6 +22,7 @@ function SizeSelect() {
             value={sizeAlias}
             onChange={(event) => dispatch(setPinSizeAlias(event.target.value as PinSizeAlias))}
         >
+            <MenuItem value='xs'>XS</MenuItem>
             <MenuItem value='s'>S</MenuItem>
             <MenuItem value='m'>M</MenuItem>
             <MenuItem value='l'>L</MenuItem>

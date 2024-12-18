@@ -44,7 +44,7 @@ export default function Board({
     pinShape,
     boardPadding = 5,
     pinsColors = null,
-    pinPadding = 0,
+    pinPadding = 2,
     emptyColor,
     mouseX = null,
     mouseY = null,

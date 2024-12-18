@@ -1,15 +1,11 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { PinShape, PinSizeAlias, GridColors, CellColor } from '../utils/mosaicTypes';
-import Mosaic from '../utils/mosaicClass';
-
-const availableWidth = 700;
-const availableHeight = 500;
-export const boardPadding = 5;
 
 const sizeSettings = {
-    s: 24,
+    xs: 20,
+    s: 25,
     m: 30,
-    l: 45,
+    l: 35,
 };
 
 type BoardStateType = {
@@ -80,14 +76,6 @@ export const boardSlice = createSlice({
         selectPinSize(state: BoardStateType): number {
             return sizeSettings[state.pinSizeAlias];
         },
-        selectPinsCountW(state: BoardStateType) {
-            const pinSize = sizeSettings[state.pinSizeAlias];
-            return Mosaic.getPinsInLineCount(availableWidth - 2 * boardPadding, pinSize);
-        },
-        selectPinsCountH(state: BoardStateType) {
-            const pinSize = sizeSettings[state.pinSizeAlias];
-            return Mosaic.getPinsInLineCount(availableHeight - 2 * boardPadding, pinSize);
-        },
         selectPinsColors(state: BoardStateType) {
             return state.pinsColors;
         },
@@ -96,12 +84,6 @@ export const boardSlice = createSlice({
 
 export const { setPinShape, setPinSizeAlias, setSelectedCell, initPinsColors, setPinColor } =
     boardSlice.actions;
-export const {
-    selectPinShape,
-    selectPinSize,
-    selectPinSizeAlias,
-    selectPinsCountW,
-    selectPinsCountH,
-    selectPinsColors,
-} = boardSlice.selectors;
+export const { selectPinShape, selectPinSize, selectPinSizeAlias, selectPinsColors } =
+    boardSlice.selectors;
 export default boardSlice.reducer;

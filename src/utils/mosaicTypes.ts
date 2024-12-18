@@ -1,5 +1,5 @@
 export type PinShape = 'round' | 'square';
-export type PinSizeAlias = 's' | 'm' | 'l';
+export type PinSizeAlias = 'xs' | 's' | 'm' | 'l';
 export type PinColor = string | null;
 
 export type PaletteColor = {

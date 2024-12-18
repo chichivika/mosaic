@@ -1,6 +1,6 @@
 import { Point, PinShape, MosaicGrid, MosaicRow, MosaicCell, GridColors } from './mosaicTypes';
 import { emptyColor as defaultEmptyColor } from './mosaicPalette';
-import { drawRoundArc, drawSquareArc, drawLines, LightenDarkenColor } from './drawUtils';
+import { drawRoundArc, drawSquareArc, LightenDarkenColor } from './drawUtils';
 
 type MosaicParams = {
     pinsCountW: number;
@@ -99,20 +99,22 @@ export default class Mosaic {
                 const isCellSelected = i === selectedRow && j === selectedCol;
 
                 ctx.beginPath();
-                this._drawPin(ctx, cell, i, j, isCellSelected);
-                if (!cell.color && !isCellSelected) {
+                this._drawPin(ctx, cell);
+                if (!cell.color) {
                     ctx.stroke();
                 } else if (cell.color) {
                     ctx.fill();
                 }
 
                 if (isCellSelected) {
-                    ctx.strokeStyle = LightenDarkenColor(cellColor, -40);
+                    ctx.strokeStyle = LightenDarkenColor(cellColor, -50);
                     if (!cell.color) {
                         ctx.fillStyle = '#e9e9e9';
                         ctx.lineWidth = 1.5;
-                        ctx.fill();
+                    } else {
+                        ctx.fillStyle = LightenDarkenColor(cellColor, -25);
                     }
+                    ctx.fill();
                     ctx.stroke();
                 }
             });
@@ -139,16 +141,10 @@ export default class Mosaic {
         ctx.clearRect(0, 0, this._boardWidth, this._boardHeight);
     }
 
-    protected _drawPin(
-        ctx: CanvasRenderingContext2D,
-        cell: MosaicCell,
-        i: number,
-        j: number,
-        isSelected: boolean,
-    ) {
+    protected _drawPin(ctx: CanvasRenderingContext2D, cell: MosaicCell) {
         switch (this.pinShape) {
             case 'square':
-                this._drawSquarePin(ctx, cell, i, j, isSelected);
+                this._drawSquarePin(ctx, cell);
                 break;
             default:
                 this._drawRoundPin(ctx, cell);
@@ -168,41 +164,17 @@ export default class Mosaic {
         });
     }
 
-    protected _drawSquarePin(
-        ctx: CanvasRenderingContext2D,
-        cell: MosaicCell,
-        i: number,
-        j: number,
-        isSelected: boolean,
-    ) {
+    protected _drawSquarePin(ctx: CanvasRenderingContext2D, cell: MosaicCell) {
         const { point } = cell;
         const x = point[0];
         const y = point[1];
 
-        const leftTop = [x, y] as Point;
-        const rightTop = [x + this.pinSize, y] as Point;
-        const leftBottom = [x, y + this.pinSize] as Point;
-        const rightBottom = [x + this.pinSize, y + this.pinSize] as Point;
-
-        if (isSelected || (i === 0 && j === 0)) {
-            drawSquareArc({
-                ctx,
-                x,
-                y,
-                side: this.pinSize,
-            });
-            return;
-        }
-        if (i === 0) {
-            drawLines({ ctx, verts: [leftTop, rightTop, rightBottom, leftBottom] });
-            return;
-        }
-        if (j === 0) {
-            drawLines({ ctx, verts: [leftTop, leftBottom, rightBottom, rightTop] });
-            return;
-        }
-
-        drawLines({ ctx, verts: [leftBottom, rightBottom, rightTop] });
+        drawSquareArc({
+            ctx,
+            x,
+            y,
+            side: this.pinSize,
+        });
     }
 
     protected _configGrid() {

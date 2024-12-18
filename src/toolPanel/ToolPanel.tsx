@@ -6,8 +6,6 @@ import PinPicker from './PinPicker';
 import EraserPicker, { StyledEraserPicker } from './EraserPicker';
 
 const StyledToolsCnt = styled.div`
-    background-color: ${(props) => props.theme.bgColor};
-    padding-bottom: 1rem;
     display: flex;
     justify-content: center;
     align-items: center;
