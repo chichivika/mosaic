@@ -19,7 +19,7 @@ export default function AppBoard() {
     const dispatch: Dispatch = useDispatch();
     const pinShape = useSelector(selectPinShape);
     const pinSize = useSelector(selectPinSize);
-    const pinPadding = 2;
+    const pinPadding = 0;
 
     const pinsCountW = Mosaic.getPinsInLineCount(
         availableWidth - 2 * boardPadding,

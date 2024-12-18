@@ -1,6 +1,6 @@
 import React, { useRef, useEffect, RefObject, useState } from 'react';
 import styled from 'styled-components';
-import { drawRectangle, drawLines, LightenDarkenColor } from '../utils/drawUtils';
+import { drawPolygon, drawLines, LightenDarkenColor } from '../utils/drawUtils';
 import colors from '../styles/colors';
 
 export const StyledCanvas = styled.canvas`
@@ -58,7 +58,7 @@ function _drawEraser(ctx: CanvasRenderingContext2D, width: number, isHovered: bo
     ctx.fillStyle = colors.fontColor;
 
     ctx.beginPath();
-    drawRectangle({
+    drawPolygon({
         ctx,
         verts: [
             [width / 4, (3 * height) / 7],
@@ -87,8 +87,8 @@ function _drawEraser(ctx: CanvasRenderingContext2D, width: number, isHovered: bo
 
     if (isHovered) {
         ctx.beginPath();
-        ctx.strokeStyle = LightenDarkenColor(colors.fontColor, -20);
-        drawRectangle({
+        ctx.strokeStyle = LightenDarkenColor(colors.fontColor, -0.2);
+        drawPolygon({
             ctx,
             verts: [
                 [(5 * width) / 8, 0],

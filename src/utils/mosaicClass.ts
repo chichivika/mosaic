@@ -1,6 +1,6 @@
 import { Point, PinShape, MosaicGrid, MosaicRow, MosaicCell, GridColors } from './mosaicTypes';
 import { emptyColor as defaultEmptyColor } from './mosaicPalette';
-import { drawRoundArc, drawSquareArc, LightenDarkenColor } from './drawUtils';
+import { drawRoundArc, drawSquarePin, drawRoundPin, DrawPinParam } from './drawUtils';
 
 type MosaicParams = {
     pinsCountW: number;
@@ -92,31 +92,13 @@ export default class Mosaic {
         this._clearBoard(ctx);
         this._grid.forEach((row: MosaicRow, i: number) => {
             row.forEach((cell: MosaicCell, j: number) => {
-                ctx.lineWidth = 1;
-                const cellColor = cell.color || this._emptyColor;
-                ctx.fillStyle = cellColor;
-                ctx.strokeStyle = cellColor;
-                const isCellSelected = i === selectedRow && j === selectedCol;
-
-                ctx.beginPath();
-                this._drawPin(ctx, cell);
-                if (!cell.color) {
-                    ctx.stroke();
-                } else if (cell.color) {
-                    ctx.fill();
-                }
-
-                if (isCellSelected) {
-                    ctx.strokeStyle = LightenDarkenColor(cellColor, -50);
-                    if (!cell.color) {
-                        ctx.fillStyle = '#e9e9e9';
-                        ctx.lineWidth = 1.5;
-                    } else {
-                        ctx.fillStyle = LightenDarkenColor(cellColor, -25);
-                    }
-                    ctx.fill();
-                    ctx.stroke();
-                }
+                this._drawPin({
+                    ctx,
+                    cell,
+                    isCellSelected: i === selectedRow && j === selectedCol,
+                    pinSize: this.pinSize,
+                    emptyColor: this._emptyColor,
+                });
             });
         });
     }
@@ -141,13 +123,13 @@ export default class Mosaic {
         ctx.clearRect(0, 0, this._boardWidth, this._boardHeight);
     }
 
-    protected _drawPin(ctx: CanvasRenderingContext2D, cell: MosaicCell) {
+    protected _drawPin(param: DrawPinParam) {
         switch (this.pinShape) {
             case 'square':
-                this._drawSquarePin(ctx, cell);
+                drawSquarePin(param);
                 break;
             default:
-                this._drawRoundPin(ctx, cell);
+                drawRoundPin(param);
         }
     }
 
@@ -161,19 +143,6 @@ export default class Mosaic {
             cx,
             cy,
             radius: this.pinSize / 2,
-        });
-    }
-
-    protected _drawSquarePin(ctx: CanvasRenderingContext2D, cell: MosaicCell) {
-        const { point } = cell;
-        const x = point[0];
-        const y = point[1];
-
-        drawSquareArc({
-            ctx,
-            x,
-            y,
-            side: this.pinSize,
         });
     }
 
