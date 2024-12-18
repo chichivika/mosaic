@@ -6,9 +6,10 @@ import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
 import ChevronRightIcon from '@mui/icons-material/ChevronRight';
 import IconButton from '../common/IconButton';
 import { colorsPalette } from '../utils/mosaicPalette';
-import { PinShape } from '../utils/mosaicTypes';
-import { selectPinShape, setDraggedColor } from '../redux/boardSlice';
-import Board from '../Board';
+import { PinShape, Palette } from '../utils/mosaicTypes';
+import { selectPinShape } from '../redux/boardSlice';
+import { setDragObject } from '../redux/dndSlice';
+import Board, { BoardClickEventObject } from '../Board';
 
 const StyledCnt = styled.div`
     background-color: inherit;
@@ -30,6 +31,7 @@ function PinPicker({ viewPinsCount = 3, pinSize = 28 }: Props = {}) {
     const pinShape: PinShape = useSelector(selectPinShape);
     const pagesCount = _getPagesCount(viewPinsCount, colorsPalette.length);
 
+    const pinsToDraw = _getPinsToDraw(viewPinsCount, currentPage);
     return (
         <StyledCnt>
             <IconButton
@@ -44,11 +46,15 @@ function PinPicker({ viewPinsCount = 3, pinSize = 28 }: Props = {}) {
                 pinShape={pinShape}
                 pinSize={pinSize}
                 pinPadding={4}
-                pinsColors={[_getPinsToDraw(viewPinsCount, currentPage)]}
+                pinsColors={[pinsToDraw]}
                 boardPadding={0}
                 useSelectedStyle
-                onClick={(_row, col) => {
-                    dispatch(setDraggedColor(colorsPalette[col].color));
+                onClick={(param: BoardClickEventObject) => {
+                    _startDragEvent({
+                        eventParam: param,
+                        pinsToDraw,
+                        dispatch,
+                    });
                 }}
             />
             <IconButton
@@ -58,6 +64,27 @@ function PinPicker({ viewPinsCount = 3, pinSize = 28 }: Props = {}) {
                 <ChevronRightIcon />
             </IconButton>
         </StyledCnt>
+    );
+}
+
+function _startDragEvent({
+    eventParam,
+    pinsToDraw,
+    dispatch,
+}: {
+    eventParam: BoardClickEventObject;
+    pinsToDraw: Palette;
+    dispatch: Dispatch;
+}) {
+    dispatch(
+        setDragObject({
+            draggedType: 'pin',
+            draggedColor: pinsToDraw[eventParam.colIndex].color,
+            dragStartMouseX: eventParam.mouseX,
+            dragStartMouseY: eventParam.mouseY,
+            mouseX: eventParam.mouseX,
+            mouseY: eventParam.mouseY,
+        }),
     );
 }
 

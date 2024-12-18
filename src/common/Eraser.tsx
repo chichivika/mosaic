@@ -1,16 +1,18 @@
 import React, { useRef, useEffect, RefObject, useState } from 'react';
 import styled from 'styled-components';
-import { drawRectangle, drawLines } from '../utils/drawUtils';
+import { drawRectangle, drawLines, LightenDarkenColor } from '../utils/drawUtils';
 import colors from '../styles/colors';
 
-export const StyledEraserCnt = styled.div`
-    display: flex;
-    align-items: center;
-    canvas {
-        cursor: pointer;
-    }
+export const StyledCanvas = styled.canvas`
+    cursor: pointer;
 `;
-export default function Eraser({ width = 28 }: { width?: number }) {
+export default function Eraser({
+    width = 28,
+    useHoverStyle = false,
+}: {
+    width?: number;
+    useHoverStyle?: boolean;
+}) {
     const canvasRef = useRef(null) as RefObject<HTMLCanvasElement>;
     const [isHovered, setIsHovered] = useState(false);
 
@@ -28,19 +30,25 @@ export default function Eraser({ width = 28 }: { width?: number }) {
     }, [width, isHovered]);
 
     return (
-        <StyledEraserCnt>
-            <canvas
-                ref={canvasRef}
-                width={width}
-                height={width}
-                onMouseMove={() => {
-                    setIsHovered(true);
-                }}
-                onMouseLeave={() => {
-                    setIsHovered(false);
-                }}
-            />
-        </StyledEraserCnt>
+        <StyledCanvas
+            ref={canvasRef}
+            width={width}
+            height={width}
+            onMouseMove={
+                useHoverStyle
+                    ? () => {
+                          setIsHovered(true);
+                      }
+                    : undefined
+            }
+            onMouseLeave={
+                useHoverStyle
+                    ? () => {
+                          setIsHovered(false);
+                      }
+                    : undefined
+            }
+        />
     );
 }
 
@@ -48,7 +56,6 @@ function _drawEraser(ctx: CanvasRenderingContext2D, width: number, isHovered: bo
     const height = (7 * width) / 8;
     ctx.strokeStyle = colors.fontColor;
     ctx.fillStyle = colors.fontColor;
-    ctx.lineWidth = 1;
 
     ctx.beginPath();
     drawRectangle({
@@ -64,6 +71,7 @@ function _drawEraser(ctx: CanvasRenderingContext2D, width: number, isHovered: bo
     ctx.stroke();
 
     ctx.beginPath();
+    ctx.fillStyle = colors.bgColor;
     drawLines({
         ctx,
         verts: [
@@ -74,12 +82,12 @@ function _drawEraser(ctx: CanvasRenderingContext2D, width: number, isHovered: bo
             [(5 * width) / 8, (6 * height) / 7],
         ],
     });
+    ctx.fill();
     ctx.stroke();
 
     if (isHovered) {
         ctx.beginPath();
-        ctx.fillStyle = colors.fontHoverColor;
-        ctx.lineWidth = 1.2;
+        ctx.strokeStyle = LightenDarkenColor(colors.fontColor, -20);
         drawRectangle({
             ctx,
             verts: [

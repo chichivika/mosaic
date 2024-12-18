@@ -3,7 +3,7 @@ import styled from 'styled-components';
 import SizeSelect from './SizeSelect';
 import ShapeSelect from './ShapeSelect';
 import PinPicker from './PinPicker';
-import Eraser, { StyledEraserCnt } from './Eraser';
+import EraserPicker, { StyledEraserPicker } from './EraserPicker';
 
 const StyledToolsCnt = styled.div`
     background-color: ${(props) => props.theme.bgColor};
@@ -18,7 +18,7 @@ const StyledToolsCnt = styled.div`
 
 const StyledPickerCnt = styled.div`
     display: flex;
-    ${StyledEraserCnt} {
+    ${StyledEraserPicker} {
         margin: 1rem;
     }
 `;
@@ -27,7 +27,7 @@ function ToolPanel() {
         <StyledToolsCnt>
             <StyledPickerCnt>
                 <PinPicker />
-                <Eraser />
+                <EraserPicker />
             </StyledPickerCnt>
             <ShapeSelect />
             <SizeSelect />

@@ -3,7 +3,15 @@ import styled from 'styled-components';
 import Mosaic from './utils/mosaicClass';
 import { PinShape, GridColors } from './utils/mosaicTypes';
 
-type ClickCallback = (rowIndex: number, colIndex: number) => void;
+export type BoardClickEventObject = {
+    rowIndex: number;
+    colIndex: number;
+    rectLeft: number;
+    rectTop: number;
+    mouseX: number;
+    mouseY: number;
+};
+export type BoardClickCallback = (param: BoardClickEventObject) => void;
 type Props = {
     pinsCountW: number;
     pinsCountH: number;
@@ -14,7 +22,7 @@ type Props = {
     pinPadding?: number;
     emptyColor?: string;
     useSelectedStyle?: boolean;
-    onClick?: ClickCallback;
+    onClick?: BoardClickCallback;
 };
 export const StyledBoardCnt = styled.div`
     display: flex;
@@ -129,12 +137,19 @@ function _clearSelectedCell(
     setSelectedRow(-1);
 }
 
-function _fireClickEvent(event: MouseEvent, mosaic: Mosaic, onClick: ClickCallback) {
+function _fireClickEvent(event: MouseEvent, mosaic: Mosaic, onClick: BoardClickCallback) {
     const canvas = event.target as HTMLCanvasElement;
     const rect = canvas.getBoundingClientRect();
     const mouseX = event.clientX - rect.left;
     const mouseY = event.clientY - rect.top;
 
-    const [row, col] = mosaic.getCellIndsByMouse(mouseX, mouseY);
-    onClick(row, col);
+    const [rowIndex, colIndex] = mosaic.getCellIndsByMouse(mouseX, mouseY);
+    onClick({
+        rowIndex,
+        colIndex,
+        rectLeft: rect.left,
+        rectTop: rect.top,
+        mouseX: event.clientX,
+        mouseY: event.clientY,
+    });
 }
