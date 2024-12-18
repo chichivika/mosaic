@@ -25,14 +25,14 @@ type Props = {
     viewPinsCount?: number;
     pinSize?: number;
 };
-function PinPicker({ viewPinsCount = 3, pinSize = 28 }: Props = {}) {
+function PinPicker({ viewPinsCount = 6, pinSize = 28 }: Props = {}) {
     const dispatch: Dispatch = useDispatch();
     const [currentPage, setCurrentPage] = useState(1);
 
     const pinShape: PinShape = useSelector(selectPinShape);
     const pagesCount = _getPagesCount(viewPinsCount, colorsPalette.length);
 
-    const pinsToDraw = _getPinsToDraw(viewPinsCount, currentPage);
+    const pinsToDraw = _getPinsToDraw(viewPinsCount, currentPage, pagesCount);
     return (
         <StyledCnt>
             <IconButton
@@ -86,9 +86,9 @@ function _startDragEvent({
     );
 }
 
-function _getPinsToDraw(viewPinsCount: number, currentPage: number) {
+function _getPinsToDraw(viewPinsCount: number, currentPage: number, pagesCount: number) {
     let startIndex: number;
-    if (currentPage !== colorsPalette.length) {
+    if (currentPage !== pagesCount) {
         startIndex = (currentPage - 1) * viewPinsCount;
     } else {
         startIndex = colorsPalette.length - viewPinsCount;
