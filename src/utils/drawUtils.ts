@@ -7,6 +7,7 @@ export type DrawPinParam = {
     isCellSelected: boolean;
     emptyColor: string;
     pinSize: number;
+    useStrokeIfNotSelected?: boolean;
 };
 
 export function drawRoundArc({
@@ -117,6 +118,57 @@ export function drawEmptySquarePin({
 }
 
 export function drawSquarePin(param: DrawPinParam) {
+    const { ctx, cell, isCellSelected, pinSize, useStrokeIfNotSelected } = param;
+    if (!cell.color) {
+        drawEmptySquarePin(param);
+        return;
+    }
+
+    const { point } = cell;
+    const x = point[0];
+    const y = point[1];
+
+    const side = pinSize;
+    const cellColor = isCellSelected ? LightenDarkenColor(cell.color, -0.2) : cell.color;
+
+    ctx.beginPath();
+    ctx.fillStyle = cellColor;
+    ctx.strokeStyle = LightenDarkenColor(cellColor, -0.2);
+    drawSquareArc({ x, y, side, ctx });
+    ctx.fill();
+
+    if (isCellSelected || useStrokeIfNotSelected) {
+        ctx.stroke();
+    }
+}
+
+export function drawRoundPin(param: DrawPinParam) {
+    const { ctx, cell, pinSize, isCellSelected } = param;
+    if (cell.color === null) {
+        drawEmptyRoundPin(param);
+        return;
+    }
+
+    const cellColor = isCellSelected ? LightenDarkenColor(cell.color, -0.15) : cell.color;
+    const { point } = cell;
+    const x = point[0];
+    const y = point[1];
+
+    const cx = x + pinSize / 2;
+    const cy = y + pinSize / 2;
+
+    ctx.beginPath();
+    ctx.fillStyle = cellColor;
+    ctx.strokeStyle = LightenDarkenColor(cellColor, -0.2);
+    drawRoundArc({ cx, cy, radius: pinSize / 2, ctx });
+    ctx.fill();
+
+    if (isCellSelected) {
+        ctx.stroke();
+    }
+}
+
+export function drawSquareGem(param: DrawPinParam) {
     const { ctx, cell, isCellSelected, pinSize } = param;
     if (!cell.color) {
         drawEmptySquarePin(param);
@@ -243,7 +295,7 @@ function getPointsForHexagon({
     return hexagonPoints;
 }
 
-export function drawRoundPin(param: DrawPinParam) {
+export function drawRoundGem(param: DrawPinParam) {
     const { ctx, cell, pinSize, isCellSelected } = param;
     if (cell.color === null) {
         drawEmptyRoundPin(param);

@@ -1,6 +1,13 @@
 import { Point, PinShape, MosaicGrid, MosaicRow, MosaicCell, GridColors } from './mosaicTypes';
 import { emptyColor as defaultEmptyColor } from './mosaicPalette';
-import { drawRoundArc, drawSquarePin, drawRoundPin, DrawPinParam } from './drawUtils';
+import {
+    drawRoundArc,
+    drawSquarePin,
+    drawRoundPin,
+    drawRoundGem,
+    drawSquareGem,
+    DrawPinParam,
+} from './drawUtils';
 
 type MosaicParams = {
     pinsCountW: number;
@@ -106,6 +113,7 @@ export default class Mosaic {
                     isCellSelected: i === selectedRow && j === selectedCol,
                     pinSize: this.pinSize,
                     emptyColor: this._emptyColor,
+                    useStrokeIfNotSelected: this.pinShape === 'square' && this.pinPadding === 0,
                 });
             });
         });
@@ -135,6 +143,12 @@ export default class Mosaic {
         switch (this.pinShape) {
             case 'square':
                 drawSquarePin(param);
+                break;
+            case 'squareGem':
+                drawSquareGem(param);
+                break;
+            case 'roundGem':
+                drawRoundGem(param);
                 break;
             default:
                 drawRoundPin(param);

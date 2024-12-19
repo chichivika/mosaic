@@ -1,9 +1,9 @@
 import { Palette } from './mosaicTypes';
 
 export const colorsPalette: Palette = [
-    { color: '#A65E2E' },
     { color: '#b83f3f' },
     { color: '#f88b65' },
+    { color: '#a47215' },
     { color: '#dcc026' },
     { color: '#a054a9' },
     { color: '#d592c1' },

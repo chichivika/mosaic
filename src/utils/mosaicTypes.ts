@@ -1,4 +1,4 @@
-export type PinShape = 'round' | 'square';
+export type PinShape = 'round' | 'roundGem' | 'square' | 'squareGem';
 export type PinSizeAlias = 'xs' | 's' | 'm' | 'l';
 export type PinColor = string | null;
 
