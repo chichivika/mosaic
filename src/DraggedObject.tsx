@@ -97,6 +97,9 @@ export default function DraggedObject() {
                 clearDraggedObject();
             }}
             onClick={() => {
+                if (draggedType === 'singlePin') {
+                    clearDraggedObject();
+                }
                 dispatch(
                     setPinColor({
                         color: pinColor,

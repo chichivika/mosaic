@@ -24,4 +24,4 @@ export type CellColor = {
 export type RowColors = CellColor[];
 export type GridColors = RowColors[];
 
-export type DraggedType = 'pin' | 'eraser' | null;
+export type DraggedType = 'pin' | 'singlePin' | 'eraser' | null;

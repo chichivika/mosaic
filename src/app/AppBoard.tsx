@@ -7,9 +7,12 @@ import {
     setSelectedCell,
     selectPinsColors,
     initPinsColors,
+    setPinColor,
 } from '../redux/boardSlice';
+import { initDragObject } from '../redux/dndSlice';
 import HoverBoard from '../HoverBoard';
 import Mosaic from '../utils/mosaicClass';
+import { BoardClickEventObject } from '../Board';
 
 const availableWidth = 1000;
 const availableHeight = 600;
@@ -48,6 +51,20 @@ export default function AppBoard() {
             pinsColors={useSelector(selectPinsColors)}
             onSelectedCellChange={(cellInds) => {
                 dispatch(setSelectedCell(cellInds));
+            }}
+            onClick={(event: BoardClickEventObject) => {
+                if (event.color === null) {
+                    return;
+                }
+                dispatch(setPinColor({ color: null }));
+                dispatch(
+                    initDragObject({
+                        draggedType: 'singlePin',
+                        draggedColor: event.color,
+                        dragStartMouseX: event.mouseX,
+                        dragStartMouseY: event.mouseY,
+                    }),
+                );
             }}
         />
     );

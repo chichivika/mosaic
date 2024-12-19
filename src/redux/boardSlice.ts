@@ -64,6 +64,8 @@ export const boardSlice = createSlice({
             }
 
             state.pinsColors[selectedRowIndex][selectedColIndex] = action.payload;
+            state.selectedRowIndex = -1;
+            state.selectedColIndex = -1;
         },
     },
     selectors: {

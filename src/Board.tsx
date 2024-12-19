@@ -10,6 +10,7 @@ export type BoardClickEventObject = {
     rectTop: number;
     mouseX: number;
     mouseY: number;
+    color: string | null;
 };
 export type BoardClickCallback = (param: BoardClickEventObject) => void;
 export type GeneralBoardProps = {
@@ -124,7 +125,11 @@ export default function Board({
                 ref={boardRef}
                 width={mosaic.getBoardWidth()}
                 height={mosaic.getBoardHeight()}
-                onClick={onClick ? (event) => _fireClickEvent(event, mosaic, onClick) : undefined}
+                onClick={
+                    onClick
+                        ? (event) => _fireClickEvent(event, mosaic, onClick, pinsColors)
+                        : undefined
+                }
                 onMouseMove={onMouseMove}
                 onMouseLeave={onMouseLeave}
             />
@@ -157,7 +162,12 @@ function _calculateSelectedCell({
     return mosaic.getCellIndsByMouse(mouseX - rect.left, mouseY - rect.top);
 }
 
-function _fireClickEvent(event: MouseEvent, mosaic: Mosaic, onClick: BoardClickCallback) {
+function _fireClickEvent(
+    event: MouseEvent,
+    mosaic: Mosaic,
+    onClick: BoardClickCallback,
+    pinsColors: GridColors | null,
+) {
     const canvas = event.target as HTMLCanvasElement;
     const rect = canvas.getBoundingClientRect();
     const mouseX = event.clientX - rect.left;
@@ -171,5 +181,6 @@ function _fireClickEvent(event: MouseEvent, mosaic: Mosaic, onClick: BoardClickC
         rectTop: rect.top,
         mouseX: event.clientX,
         mouseY: event.clientY,
+        color: pinsColors?.[rowIndex]?.[colIndex]?.color || null,
     });
 }

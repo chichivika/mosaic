@@ -1,4 +1,4 @@
-import React, { MouseEvent, useState } from 'react';
+import React, { MouseEvent, useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 import Board, { GeneralBoardProps } from './Board';
 import { selectDraggedType, selectMouseX, selectMouseY } from './redux/dndSlice';
@@ -17,6 +17,11 @@ export default function HoverBoard(props: HoverBoardProps) {
     const dragMouseX = useSelector(selectMouseX);
     const dragMouseY = useSelector(selectMouseY);
     const isDNDMode = concernsForDND && draggedType !== null;
+
+    useEffect(() => {
+        setMouseX(null);
+        setMouseY(null);
+    }, [isDNDMode]);
 
     return (
         <Board
