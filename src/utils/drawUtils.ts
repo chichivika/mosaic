@@ -163,7 +163,7 @@ export function drawSquarePin(param: DrawPinParam) {
     ctx.fill();
 
     ctx.beginPath();
-    ctx.fillStyle = LightenDarkenColor(cellColor, 0.2);
+    ctx.fillStyle = LightenDarkenColor(cellColor, 0.25);
     drawPolygon({
         ctx,
         verts: [outerRightTop, outerRightBottom, innerRightBottom, innerRightTop],
@@ -177,6 +177,15 @@ export function drawSquarePin(param: DrawPinParam) {
         verts: [outerLeftBottom, outerLeftTop, innerLeftTop, innerLeftBottom],
     });
     ctx.fill();
+
+    const lightPoint = [innerRightTop[0] + innerIndent / 2, innerRightTop[1]];
+    drawHightLight({
+        ctx,
+        cx: lightPoint[0],
+        cy: lightPoint[1],
+        lightLength: pinSize < 26 ? 2 : 3,
+        spotRadius: pinSize < 26 ? 1 : 2,
+    });
 }
 
 function drawEmptyRoundPin({ ctx, cell, isCellSelected, emptyColor, pinSize }: DrawPinParam) {
@@ -264,7 +273,7 @@ export function drawRoundPin(param: DrawPinParam) {
     drawPolygon({ ctx, verts: innerHexagonPoints });
     ctx.fill();
 
-    const fillStylesIndex = [0.1, -0.1, -0.2, -0.1, 0.1, 0.2];
+    const fillStylesIndex = [0.1, -0.1, -0.2, -0.2, 0.1, 0.25];
     innerHexagonPoints.forEach((_hexPoint, i) => {
         ctx.beginPath();
         ctx.fillStyle = LightenDarkenColor(cellColor, fillStylesIndex[i]);
@@ -282,4 +291,63 @@ export function drawRoundPin(param: DrawPinParam) {
         ctx.arc(cx, cy, pinSize / 2, i * angle, (i + 1) * angle);
         ctx.fill();
     });
+
+    const lastOuterVert: Point = outerHexagonPoints[outerHexagonPoints.length - 1];
+    const lastInnerVert: Point = innerHexagonPoints[innerHexagonPoints.length - 1];
+    const lightPoint = [
+        lastInnerVert[0] + (lastOuterVert[0] - lastInnerVert[0]) / 2,
+        lastInnerVert[1] + (lastOuterVert[1] - lastInnerVert[1]) / 2,
+    ];
+    drawHightLight({
+        ctx,
+        cx: lightPoint[0],
+        cy: lightPoint[1],
+        lightLength: pinSize < 26 ? 2 : 3,
+        spotRadius: pinSize < 26 ? 1 : 2,
+    });
+}
+
+function drawHightLight({
+    ctx,
+    cx,
+    cy,
+    lightLength = 3,
+    spotRadius = 2,
+    rotate = false,
+}: {
+    ctx: CanvasRenderingContext2D;
+    cx: number;
+    cy: number;
+    lightLength?: number;
+    spotRadius?: number;
+    rotate?: boolean;
+}) {
+    ctx.fillStyle = '#ffffff';
+    ctx.strokeStyle = '#ffffff';
+
+    const rotateCoefficient = rotate ? 0 : 1;
+
+    ctx.beginPath();
+    drawLines({
+        ctx,
+        verts: [
+            [cx - rotateCoefficient * lightLength, cy - lightLength],
+            [cx + rotateCoefficient * lightLength, cy + lightLength],
+        ],
+    });
+    ctx.stroke();
+
+    ctx.beginPath();
+    drawLines({
+        ctx,
+        verts: [
+            [cx + lightLength, cy - rotateCoefficient * lightLength],
+            [cx - lightLength, cy + rotateCoefficient * lightLength],
+        ],
+    });
+    ctx.stroke();
+
+    ctx.beginPath();
+    ctx.arc(cx, cy, spotRadius, 0, 2 * Math.PI);
+    ctx.fill();
 }
