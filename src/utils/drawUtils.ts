@@ -183,8 +183,8 @@ export function drawSquarePin(param: DrawPinParam) {
         ctx,
         cx: lightPoint[0],
         cy: lightPoint[1],
-        lightLength: pinSize < 26 ? 2 : 3,
-        spotRadius: pinSize < 26 ? 1 : 2,
+        lightLength: pinSize < 25 ? 1 : 2.5,
+        spotRadius: pinSize < 25 ? 1 : 2,
     });
 }
 
