@@ -13,7 +13,7 @@ export const colorsPalette: Palette = [
     { color: '#319f63' },
     { color: '#70dc64' },
     { color: '#4f4f4f' },
-    { color: '#c0c0c0' },
+    { color: '#979797' },
 ];
 export const emptyColor = '#d3d3d3';
 export const emptyFillColor = '#e9e9e9';

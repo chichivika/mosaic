@@ -12,6 +12,7 @@ type MosaicParams = {
     pinPadding?: number;
     pinsColors?: GridColors | null;
     emptyColor?: string;
+    ignoreEmptyCells?: boolean;
 };
 
 const defaultPinPadding = 0;
@@ -39,6 +40,8 @@ export default class Mosaic {
     public readonly pinPadding: number;
 
     public readonly pinsColors: GridColors | null;
+
+    public readonly ignoreEmptyCells: boolean;
 
     protected readonly _boardWidth: number;
 
@@ -68,6 +71,7 @@ export default class Mosaic {
 
         this.pinsColors = param.pinsColors || null;
         this._emptyColor = param.emptyColor || defaultEmptyColor;
+        this.ignoreEmptyCells = param.ignoreEmptyCells || false;
 
         this._grid = this._configGrid();
     }
@@ -86,12 +90,16 @@ export default class Mosaic {
         selectedRow = -1,
     }: {
         ctx: CanvasRenderingContext2D;
-        selectedCol: number;
-        selectedRow: number;
+        selectedCol?: number;
+        selectedRow?: number;
     }) {
         this._clearBoard(ctx);
         this._grid.forEach((row: MosaicRow, i: number) => {
             row.forEach((cell: MosaicCell, j: number) => {
+                if (this.ignoreEmptyCells && !cell.color) {
+                    return;
+                }
+
                 this._drawPin({
                     ctx,
                     cell,

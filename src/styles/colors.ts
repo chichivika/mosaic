@@ -1,6 +1,6 @@
 export default {
     fontColor: '#787474',
-    fontHoverColor: '#504f4f',
+    fontHoverColor: '#5b5b5b',
     fontActiveColor: '#ffae92',
     fontDisabledColor: '#b0b0b0',
     bgColor: '#f9f9f9',

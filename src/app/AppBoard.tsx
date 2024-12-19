@@ -6,37 +6,29 @@ import {
     selectPinSize,
     setSelectedCell,
     selectPinsColors,
-    initPinsColors,
+    initBoard,
     setPinColor,
+    selectPinsCount,
+    boardPadding,
+    pinPadding,
+    resizeBoard,
 } from '../redux/boardSlice';
 import { initDragObject } from '../redux/dndSlice';
 import HoverBoard from '../HoverBoard';
-import Mosaic from '../utils/mosaicClass';
 import { BoardClickEventObject } from '../Board';
-
-const availableWidth = 1000;
-const availableHeight = 600;
-const boardPadding = 5;
 
 export default function AppBoard() {
     const dispatch: Dispatch = useDispatch();
     const pinShape = useSelector(selectPinShape);
     const pinSize = useSelector(selectPinSize);
-    const pinPadding = 0;
-
-    const pinsCountW = Mosaic.getPinsInLineCount(
-        availableWidth - 2 * boardPadding,
-        pinSize,
-        pinPadding,
-    );
-    const pinsCountH = Mosaic.getPinsInLineCount(
-        availableHeight - 2 * boardPadding,
-        pinSize,
-        pinPadding,
-    );
+    const [pinsCountW, pinsCountH] = useSelector(selectPinsCount);
 
     useEffect(() => {
-        dispatch(initPinsColors({ pinsCountW, pinsCountH }));
+        dispatch(initBoard());
+    }, []);
+
+    useEffect(() => {
+        dispatch(resizeBoard([pinsCountW, pinsCountH]));
     }, [pinsCountW, pinsCountH]);
 
     return (

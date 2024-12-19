@@ -2,7 +2,7 @@ import React from 'react';
 import styled from 'styled-components';
 import { IconButtonProps, IconButton as UiIconButton } from '@mui/material';
 
-const StyledIconButton = styled(UiIconButton)`
+export const StyledIconButton = styled(UiIconButton)`
     &.MuiButtonBase-root.MuiIconButton-root {
         padding: 0px;
         color: ${(props) => props.theme.fontColor};
