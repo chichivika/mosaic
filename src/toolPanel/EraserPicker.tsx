@@ -1,4 +1,5 @@
 import React, { MouseEvent } from 'react';
+import { Tooltip } from '@mui/material';
 import styled from 'styled-components';
 import { Dispatch } from '@reduxjs/toolkit';
 import { useDispatch } from 'react-redux';
@@ -12,19 +13,21 @@ export const StyledEraserPicker = styled.div`
 export default function EraserPicker() {
     const dispatch: Dispatch = useDispatch();
     return (
-        <StyledEraserPicker
-            onClick={(event: MouseEvent) => {
-                dispatch(
-                    initDragObject({
-                        draggedType: 'eraser',
-                        draggedColor: null,
-                        dragStartMouseX: event.clientX,
-                        dragStartMouseY: event.clientY,
-                    }),
-                );
-            }}
-        >
-            <Eraser useHoverStyle />
-        </StyledEraserPicker>
+        <Tooltip title='Eraser'>
+            <StyledEraserPicker
+                onClick={(event: MouseEvent) => {
+                    dispatch(
+                        initDragObject({
+                            draggedType: 'eraser',
+                            draggedColor: null,
+                            dragStartMouseX: event.clientX,
+                            dragStartMouseY: event.clientY,
+                        }),
+                    );
+                }}
+            >
+                <Eraser useHoverStyle />
+            </StyledEraserPicker>
+        </Tooltip>
     );
 }
