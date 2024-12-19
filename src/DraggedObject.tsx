@@ -42,16 +42,11 @@ export default function DraggedObject() {
         if (event.clientX === undefined || event.clientY === undefined) {
             return;
         }
-        const positionLeft = Math.min(
-            event.clientX - pinSize / 2,
-            document.body.clientWidth - pinSize - 5,
-        );
-        const positionTop = Math.min(
-            event.clientY - pinSize / 2,
-            document.body.clientHeight - pinSize - 5,
-        );
-        pinCnt.style.left = `${positionLeft}px`;
-        pinCnt.style.top = `${positionTop}px`;
+        const positionLeft = Math.min(event.clientX, document.body.clientWidth - pinSize);
+        const positionTop = Math.min(event.clientY, document.body.clientHeight - pinSize);
+        const newPosition = _getPositionByCursor(positionLeft, positionTop, pinSize);
+        pinCnt.style.left = `${newPosition.left}px`;
+        pinCnt.style.top = `${newPosition.top}px`;
 
         dispatch(
             setMousePosition({
@@ -114,7 +109,7 @@ export default function DraggedObject() {
 
 function _getPositionByCursor(mouseX: number, mouseY: number, pinSize: number) {
     return {
-        left: mouseX - pinSize / 2,
-        top: mouseY - pinSize / 2,
+        left: mouseX + window.scrollX - pinSize / 2,
+        top: mouseY + window.scrollY - pinSize / 2,
     };
 }
