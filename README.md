@@ -1,4 +1,5 @@
-# Mosaic using React + Typescript
+# Mosaic
+Desktop application using React + Typescript.
 
 Do you remember that mosaic from your childhood with white board and colorful pins? Here it is.
 Get fun creating your own mosaic image. Try different types and shapes of the pins. Download the image and use it anywhere.
