@@ -5,10 +5,12 @@ Get fun creating your own mosaic image. Try different types and shapes of the pi
 
 <img src="public/mosaic_screen_board.JPG" width="800"/>
 
+<p>
 <img src="public/mosaicHeart1.png" width="200" />
 <img src="public/mosaicHeart2.png" width="200" />
 <img src="public/mosaicHeart3.png" width="200" />
 <img src="public/mosaicHeart4.png" width="200" />
+</p>
 
 ## Available Scripts
 
