@@ -1,7 +1,6 @@
 import { Point, PinShape, MosaicGrid, MosaicRow, MosaicCell, GridColors } from './mosaicTypes';
 import { emptyColor as defaultEmptyColor } from './mosaicPalette';
 import {
-    drawRoundArc,
     drawSquarePin,
     drawRoundPin,
     drawRoundGem,
@@ -60,6 +59,10 @@ export default class Mosaic {
 
     protected _outerPinSize: number;
 
+    protected _previousSelectedRow: number;
+
+    protected _previousSelectedCol: number;
+
     constructor(param: MosaicParams) {
         this.pinsCountW = param.pinsCountW;
         this.pinsCountH = param.pinsCountH;
@@ -80,6 +83,9 @@ export default class Mosaic {
         this._emptyColor = param.emptyColor || defaultEmptyColor;
         this.ignoreEmptyCells = param.ignoreEmptyCells || false;
 
+        this._previousSelectedRow = -1;
+        this._previousSelectedCol = -1;
+
         this._grid = this._configGrid();
     }
 
@@ -91,18 +97,10 @@ export default class Mosaic {
         return this._boardHeight;
     }
 
-    public drawBoard({
-        ctx,
-        selectedCol = -1,
-        selectedRow = -1,
-    }: {
-        ctx: CanvasRenderingContext2D;
-        selectedCol?: number;
-        selectedRow?: number;
-    }) {
+    public drawBoard({ ctx }: { ctx: CanvasRenderingContext2D }) {
         this._clearBoard(ctx);
-        this._grid.forEach((row: MosaicRow, i: number) => {
-            row.forEach((cell: MosaicCell, j: number) => {
+        this._grid.forEach((row: MosaicRow) => {
+            row.forEach((cell: MosaicCell) => {
                 if (this.ignoreEmptyCells && !cell.color) {
                     return;
                 }
@@ -110,13 +108,58 @@ export default class Mosaic {
                 this._drawPin({
                     ctx,
                     cell,
-                    isCellSelected: i === selectedRow && j === selectedCol,
+                    isCellSelected: false,
                     pinSize: this.pinSize,
                     emptyColor: this._emptyColor,
                     useStrokeIfNotSelected: this.pinShape === 'square' && this.pinPadding === 0,
                 });
             });
         });
+    }
+
+    redrawCell({
+        ctx,
+        isCellSelected,
+        cell,
+    }: {
+        ctx: CanvasRenderingContext2D;
+        isCellSelected: boolean;
+        cell: MosaicCell;
+    }) {
+        const { point } = cell;
+        ctx.clearRect(point[0], point[1], this.pinSize, this.pinSize);
+        this._drawPin({
+            ctx,
+            cell,
+            isCellSelected,
+            pinSize: this.pinSize,
+            emptyColor: this._emptyColor,
+            useStrokeIfNotSelected: this.pinShape === 'square' && this.pinPadding === 0,
+        });
+    }
+
+    drawSelectedCell({
+        ctx,
+        selectedCol,
+        selectedRow,
+    }: {
+        ctx: CanvasRenderingContext2D;
+        selectedCol: number;
+        selectedRow: number;
+    }) {
+        const previousCell = this._grid[this._previousSelectedRow]?.[this._previousSelectedCol];
+        if (previousCell) {
+            this.redrawCell({ ctx, cell: previousCell, isCellSelected: false });
+        }
+
+        this._previousSelectedRow = selectedRow;
+        this._previousSelectedCol = selectedCol;
+
+        const cell = this._grid[selectedRow]?.[selectedCol];
+        if (!cell) {
+            return;
+        }
+        this.redrawCell({ ctx, cell, isCellSelected: true });
     }
 
     public getCellIndsByMouse(x: number, y: number): Point {
@@ -153,19 +196,6 @@ export default class Mosaic {
             default:
                 drawRoundPin(param);
         }
-    }
-
-    protected _drawRoundPin(ctx: CanvasRenderingContext2D, cell: MosaicCell) {
-        const { point } = cell;
-        const cx = point[0] + this.pinSize / 2;
-        const cy = point[1] + this.pinSize / 2;
-
-        drawRoundArc({
-            ctx,
-            cx,
-            cy,
-            radius: this.pinSize / 2,
-        });
     }
 
     protected _configGrid() {

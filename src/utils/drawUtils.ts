@@ -134,7 +134,7 @@ export function drawSquarePin(param: DrawPinParam) {
     ctx.beginPath();
     ctx.fillStyle = cellColor;
     ctx.strokeStyle = LightenDarkenColor(cellColor, -0.2);
-    drawSquareArc({ x, y, side, ctx });
+    drawSquareArc({ x: x + 0.5, y: y + 0.5, side: side - 1, ctx });
     ctx.fill();
 
     if (isCellSelected || useStrokeIfNotSelected) {
@@ -150,6 +150,8 @@ export function drawRoundPin(param: DrawPinParam) {
     }
 
     const cellColor = isCellSelected ? LightenDarkenColor(cell.color, -0.15) : cell.color;
+    const radius = pinSize / 2 - 0.5;
+
     const { point } = cell;
     const x = point[0];
     const y = point[1];
@@ -159,13 +161,10 @@ export function drawRoundPin(param: DrawPinParam) {
 
     ctx.beginPath();
     ctx.fillStyle = cellColor;
-    ctx.strokeStyle = LightenDarkenColor(cellColor, -0.2);
-    drawRoundArc({ cx, cy, radius: pinSize / 2, ctx });
+    ctx.strokeStyle = isCellSelected ? LightenDarkenColor(cellColor, -0.2) : cellColor;
+    drawRoundArc({ cx, cy, radius, ctx });
     ctx.fill();
-
-    if (isCellSelected) {
-        ctx.stroke();
-    }
+    ctx.stroke();
 }
 
 export function drawSquareGem(param: DrawPinParam) {

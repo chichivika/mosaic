@@ -104,20 +104,29 @@ export default function Board({
 
     useEffect(() => {
         const canvas = boardRef.current;
-        if (!canvas) {
-            return;
-        }
-        const ctx = canvas.getContext('2d');
-        if (ctx === null) {
+        const ctx = canvas?.getContext('2d');
+        if (!ctx) {
             return;
         }
 
         mosaic.drawBoard({
             ctx,
+        });
+    }, [mosaic]);
+
+    useEffect(() => {
+        const canvas = boardRef.current;
+        const ctx = canvas?.getContext('2d');
+        if (!ctx) {
+            return;
+        }
+
+        mosaic.drawSelectedCell({
+            ctx,
             selectedCol,
             selectedRow,
         });
-    }, [mosaic, selectedRow, selectedCol]);
+    }, [mosaic, selectedCol, selectedRow]);
 
     return (
         <StyledBoardCnt>
