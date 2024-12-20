@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, RefObject } from 'react';
 import { Dispatch } from '@reduxjs/toolkit';
 import styled from 'styled-components';
+import { throttle } from 'lodash';
 import { useSelector, useDispatch } from 'react-redux';
 import { selectPinShape, selectPinSize, setPinColor } from './redux/boardSlice';
 import {
@@ -34,7 +35,7 @@ export default function DraggedObject() {
     const clearDraggedObject = () => {
         dispatch(clearDragObject());
     };
-    const updateDraggedCoordinates = (event: MouseEventInit) => {
+    const updateDraggedCoordinates = throttle((event: MouseEventInit) => {
         const pinCnt = pinCntRef.current;
         if (pinCnt === null) {
             return;
@@ -54,7 +55,7 @@ export default function DraggedObject() {
                 mouseY: event.clientY,
             }),
         );
-    };
+    }, 20);
 
     useEffect(() => {
         if (draggedType === null) {

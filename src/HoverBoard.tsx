@@ -1,5 +1,6 @@
 import React, { MouseEvent, useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
+import { throttle } from 'lodash';
 import Board, { GeneralBoardProps } from './Board';
 import { selectDraggedType, selectMouseX, selectMouseY } from './redux/dndSlice';
 
@@ -31,10 +32,10 @@ export default function HoverBoard(props: HoverBoardProps) {
             onMouseMove={
                 isDNDMode
                     ? undefined
-                    : (event: MouseEvent) => {
+                    : throttle((event: MouseEvent) => {
                           setMouseX(event.clientX);
                           setMouseY(event.clientY);
-                      }
+                      }, 100)
             }
             onMouseLeave={
                 isDNDMode

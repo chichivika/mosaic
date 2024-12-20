@@ -34,7 +34,7 @@ export default function Eraser({
             ref={canvasRef}
             width={width}
             height={width}
-            onMouseMove={
+            onMouseOver={
                 useHoverStyle
                     ? () => {
                           setIsHovered(true);
