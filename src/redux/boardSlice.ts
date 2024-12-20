@@ -156,7 +156,7 @@ export const boardSlice = createSlice({
 
             const link = document.createElement('a');
             link.download = 'mosaic.png';
-            link.href = canvas.toDataURL('image/png', 0);
+            link.href = canvas.toDataURL('image/png', 1);
             link.click();
         },
     },
