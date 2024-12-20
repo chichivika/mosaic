@@ -1,0 +1,14 @@
+{
+  "files": {
+    "main.css": "/react-gh-pages/static/css/main.cb4e934c.css",
+    "main.js": "/react-gh-pages/static/js/main.6c6cb45e.js",
+    "static/media/Roboto-Regular.ttf": "/react-gh-pages/static/media/Roboto-Regular.27f62b53b93858475a7f.ttf",
+    "index.html": "/react-gh-pages/index.html",
+    "main.cb4e934c.css.map": "/react-gh-pages/static/css/main.cb4e934c.css.map",
+    "main.6c6cb45e.js.map": "/react-gh-pages/static/js/main.6c6cb45e.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.cb4e934c.css",
+    "static/js/main.6c6cb45e.js"
+  ]
+}
