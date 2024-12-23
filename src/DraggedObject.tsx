@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, RefObject } from 'react';
+import React, { useEffect, useRef, RefObject, useCallback } from 'react';
 import { Dispatch } from '@reduxjs/toolkit';
 import styled from 'styled-components';
 import { throttle } from 'lodash';
@@ -32,43 +32,48 @@ export default function DraggedObject() {
 
     const pinCntRef = useRef(null) as RefObject<HTMLDivElement>;
 
-    const clearDraggedObject = () => {
+    const clearDraggedObject = useCallback(() => {
         dispatch(clearDragObject());
-    };
-    const updateDraggedCoordinates = throttle((event: MouseEventInit) => {
-        const pinCnt = pinCntRef.current;
-        if (pinCnt === null) {
-            return;
-        }
-        if (event.clientX === undefined || event.clientY === undefined) {
-            return;
-        }
-        const positionLeft = Math.min(event.clientX, document.body.clientWidth - pinSize);
-        const positionTop = Math.min(event.clientY, document.body.clientHeight - pinSize);
-        const newPosition = _getPositionByCursor(positionLeft, positionTop, pinSize);
-        pinCnt.style.left = `${newPosition.left}px`;
-        pinCnt.style.top = `${newPosition.top}px`;
+    }, [dispatch]);
 
-        dispatch(
-            setMousePosition({
-                mouseX: event.clientX,
-                mouseY: event.clientY,
-            }),
-        );
-    }, 20);
+    const updateDraggedCoordinates = useCallback(
+        (event: MouseEventInit) => {
+            const pinCnt = pinCntRef.current;
+            if (pinCnt === null) {
+                return;
+            }
+            if (event.clientX === undefined || event.clientY === undefined) {
+                return;
+            }
+            const positionLeft = Math.min(event.clientX, document.body.clientWidth - pinSize);
+            const positionTop = Math.min(event.clientY, document.body.clientHeight - pinSize);
+            const newPosition = _getPositionByCursor(positionLeft, positionTop, pinSize);
+            pinCnt.style.left = `${newPosition.left}px`;
+            pinCnt.style.top = `${newPosition.top}px`;
+
+            dispatch(
+                setMousePosition({
+                    mouseX: event.clientX,
+                    mouseY: event.clientY,
+                }),
+            );
+        },
+        [dispatch, pinSize],
+    );
 
     useEffect(() => {
         if (draggedType === null) {
             return;
         }
-        document.onmousemove = updateDraggedCoordinates;
+        const throttledUpdateCallback = throttle(updateDraggedCoordinates, 20);
+        document.onmousemove = throttledUpdateCallback;
         document.onmouseleave = clearDraggedObject;
 
         return () => {
-            document.removeEventListener('onmousemove', updateDraggedCoordinates);
+            document.removeEventListener('onmousemove', throttledUpdateCallback);
             document.removeEventListener('onmouseleave', clearDraggedObject);
         };
-    }, [draggedType]);
+    }, [draggedType, clearDraggedObject, updateDraggedCoordinates]);
 
     const initialPosition = _getPositionByCursor(dragStartMouseX, dragStartMouseY, pinSize);
 

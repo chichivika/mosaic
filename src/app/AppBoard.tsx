@@ -24,7 +24,7 @@ export default function AppBoard() {
 
     useEffect(() => {
         dispatch(resizeBoard([pinsCountW, pinsCountH]));
-    }, [pinsCountW, pinsCountH]);
+    }, [pinsCountW, pinsCountH, dispatch]);
 
     return (
         <HoverBoard
