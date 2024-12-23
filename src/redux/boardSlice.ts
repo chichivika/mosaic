@@ -90,6 +90,12 @@ export const boardSlice = createSlice({
                 return;
             }
 
+            if (
+                state.pinsColors[selectedRowIndex][selectedColIndex].color === action.payload.color
+            ) {
+                return;
+            }
+
             state.pinsColors[selectedRowIndex][selectedColIndex] = action.payload;
             state.selectedRowIndex = -1;
             state.selectedColIndex = -1;
