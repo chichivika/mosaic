@@ -6,7 +6,6 @@ import {
     selectPinSize,
     setSelectedCell,
     selectPinsColors,
-    initBoard,
     setPinColor,
     selectPinsCount,
     boardPadding,
@@ -22,10 +21,6 @@ export default function AppBoard() {
     const pinShape = useSelector(selectPinShape);
     const pinSize = useSelector(selectPinSize);
     const [pinsCountW, pinsCountH] = useSelector(selectPinsCount);
-
-    useEffect(() => {
-        dispatch(initBoard());
-    }, []);
 
     useEffect(() => {
         dispatch(resizeBoard([pinsCountW, pinsCountH]));

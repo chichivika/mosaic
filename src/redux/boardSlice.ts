@@ -27,7 +27,7 @@ const initialState: BoardStateType = {
     pinSizeAlias: 'm',
     selectedRowIndex: -1,
     selectedColIndex: -1,
-    pinsColors: null,
+    pinsColors: heartColors,
 };
 
 export const boardSlice = createSlice({
@@ -56,10 +56,6 @@ export const boardSlice = createSlice({
                     cell.color = null;
                 });
             });
-        },
-
-        initBoard(state: BoardStateType) {
-            state.pinsColors = heartColors;
         },
 
         resizeBoard(
@@ -194,7 +190,6 @@ export const {
     setPinShape,
     setPinSizeAlias,
     setSelectedCell,
-    initBoard,
     setPinColor,
     clearBoard,
     resizeBoard,
