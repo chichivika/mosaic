@@ -1,4 +1,4 @@
-import React, { MouseEvent, useState } from 'react';
+import React, { MouseEvent, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { throttle } from 'lodash';
 import Board, { GeneralBoardProps } from './Board';
@@ -17,7 +17,21 @@ export default function HoverBoard(props: HoverBoardProps) {
     const draggedType = useSelector(selectDraggedType);
     const dragMouseX = useSelector(selectMouseX);
     const dragMouseY = useSelector(selectMouseY);
+
     const isDNDMode = concernsForDND && draggedType !== null;
+    const prevIsDNDModeRef = useRef(false);
+
+    const clearMousePosition = () => {
+        setMouseX(null);
+        setMouseY(null);
+    };
+
+    if (isDNDMode !== prevIsDNDModeRef.current) {
+        prevIsDNDModeRef.current = isDNDMode;
+        if (isDNDMode) {
+            clearMousePosition();
+        }
+    }
 
     return (
         <Board
@@ -36,8 +50,7 @@ export default function HoverBoard(props: HoverBoardProps) {
                 isDNDMode
                     ? undefined
                     : () => {
-                          setMouseX(null);
-                          setMouseY(null);
+                          clearMousePosition();
                       }
             }
         />
