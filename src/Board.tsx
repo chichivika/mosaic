@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useMemo, useState, RefObject, MouseEvent } from 'react';
+import React, { useEffect, useRef, useMemo, RefObject, MouseEvent, MutableRefObject } from 'react';
 import styled from 'styled-components';
 import Mosaic from './utils/mosaicClass';
 import { PinShape, GridColors } from './utils/mosaicTypes';
@@ -55,8 +55,8 @@ export default function Board({
     onSelectedCellChange,
 }: BoardProps) {
     const boardRef = useRef(null) as RefObject<HTMLCanvasElement>;
-    const [selectedRow, setSelectedRow] = useState(-1);
-    const [selectedCol, setSelectedCol] = useState(-1);
+    const prevSelectedCellRef = useRef([-1, -1]);
+    const prevMosaicRef: MutableRefObject<Mosaic | null> = useRef(null);
 
     const mosaic = useMemo(
         () =>
@@ -88,45 +88,36 @@ export default function Board({
         if (!canvas) {
             return;
         }
-        const [row, col] = _calculateSelectedCell({
+        const ctx = canvas?.getContext('2d');
+        if (!ctx) {
+            return;
+        }
+
+        if (prevMosaicRef.current !== mosaic) {
+            prevMosaicRef.current = mosaic;
+            mosaic.drawBoard({
+                ctx,
+            });
+        }
+
+        const [selectedRow, selectedCol] = _calculateSelectedCell({
             mouseX,
             mouseY,
             mosaic,
             canvas,
         });
-        setSelectedRow(row);
-        setSelectedCol(col);
-    }, [boardRef, mouseX, mouseY, mosaic]);
 
-    useEffect(() => {
-        onSelectedCellChange?.([selectedRow, selectedCol]);
-    }, [selectedRow, selectedCol, onSelectedCellChange]);
-
-    useEffect(() => {
-        const canvas = boardRef.current;
-        const ctx = canvas?.getContext('2d');
-        if (!ctx) {
-            return;
+        const [prevRow, prevCol] = prevSelectedCellRef.current;
+        if (prevRow !== selectedRow || prevCol !== selectedCol) {
+            prevSelectedCellRef.current = [selectedRow, selectedCol];
+            onSelectedCellChange?.([selectedRow, selectedCol]);
+            mosaic.drawSelectedCell({
+                ctx,
+                selectedCol,
+                selectedRow,
+            });
         }
-
-        mosaic.drawBoard({
-            ctx,
-        });
-    }, [mosaic]);
-
-    useEffect(() => {
-        const canvas = boardRef.current;
-        const ctx = canvas?.getContext('2d');
-        if (!ctx) {
-            return;
-        }
-
-        mosaic.drawSelectedCell({
-            ctx,
-            selectedCol,
-            selectedRow,
-        });
-    }, [mosaic, selectedCol, selectedRow]);
+    }, [boardRef, mouseX, mouseY, mosaic, onSelectedCellChange]);
 
     return (
         <StyledBoardCnt>
