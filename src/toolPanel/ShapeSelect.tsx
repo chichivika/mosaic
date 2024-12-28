@@ -5,9 +5,11 @@ import { useSelector, useDispatch } from 'react-redux';
 import MenuItem from '../common/MenuItem';
 import Select from '../common/Select';
 import Pin from '../common/Pin';
-import { setPinShape, selectPinShape } from '../redux/boardSlice';
+import { setPinShape } from '../redux/board/boardSlice';
+import { selectPinShape } from '../redux/board/boardSelectors';
 import { PinShape } from '../utils/mosaicTypes';
 import colors from '../styles/colors';
+import { selectIsDNDMode } from '../redux/dnd/dndSelectors';
 
 const StyledMenuItem = styled(MenuItem)`
     &.MuiMenuItem-root {
@@ -16,11 +18,13 @@ const StyledMenuItem = styled(MenuItem)`
 function ShapeSelect() {
     const dispatch: Dispatch = useDispatch();
     const shapeValue = useSelector(selectPinShape);
-    const pinColor = colors.selectPinShapeColor;
+    const isDNDMode = useSelector(selectIsDNDMode);
+    const pinColor = isDNDMode ? colors.selectPinShapeDisabledColor : colors.selectPinShapeColor;
 
     return (
         <Select
             value={shapeValue}
+            disabled={isDNDMode}
             onChange={(event) => dispatch(setPinShape(event.target.value as PinShape))}
         >
             <StyledMenuItem value='round'>

@@ -3,7 +3,7 @@ import { Tooltip } from '@mui/material';
 import styled from 'styled-components';
 import { Dispatch } from '@reduxjs/toolkit';
 import { useDispatch } from 'react-redux';
-import { initDragObject } from '../redux/dndSlice';
+import { initDraggedObject } from '../redux/dnd/dndSlice';
 import Eraser from '../common/Eraser';
 
 export const StyledEraserPicker = styled.div`
@@ -17,7 +17,7 @@ export default function EraserPicker() {
             <StyledEraserPicker
                 onClick={(event: MouseEvent) => {
                     dispatch(
-                        initDragObject({
+                        initDraggedObject({
                             draggedType: 'eraser',
                             draggedColor: null,
                             dragStartMouseX: event.clientX,

@@ -9,19 +9,21 @@ import {
 } from '@mui/material';
 import CancelPresentationIcon from '@mui/icons-material/CancelPresentation';
 import { Dispatch } from '@reduxjs/toolkit';
-import { useDispatch } from 'react-redux';
-import { clearBoard } from '../redux/boardSlice';
+import { useDispatch, useSelector } from 'react-redux';
+import { clearBoard } from '../redux/board/boardSlice';
 import IconButton from '../common/IconButton';
 import Button from '../common/Button';
+import { selectIsDNDMode } from '../redux/dnd/dndSelectors';
 
 export default function ClearIcon() {
     const dispatch: Dispatch = useDispatch();
     const [isDialogOpen, setDialogIsOpen] = useState(false);
+    const isDNDMode = useSelector(selectIsDNDMode);
 
     return (
         <>
             <Tooltip title='Clear the board'>
-                <IconButton>
+                <IconButton disabled={isDNDMode}>
                     <CancelPresentationIcon
                         onClick={() => {
                             setDialogIsOpen(true);

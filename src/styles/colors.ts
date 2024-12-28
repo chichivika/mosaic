@@ -7,4 +7,5 @@ export default {
     selectedItemBgColor: 'rgb(253 225 200 / 54%)',
     selectedItemHoverBgColor: 'rgb(243 203 167 / 54%)',
     selectPinShapeColor: '#979797',
+    selectPinShapeDisabledColor: '#aeaeae',
 };

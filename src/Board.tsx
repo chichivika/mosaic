@@ -23,7 +23,6 @@ export type GeneralBoardProps = {
     pinPadding?: number;
     emptyColor?: string;
     onClick?: BoardClickCallback;
-    onSelectedCellChange?: (indicies: [rowIndex: number, colIndex: number]) => void;
 };
 type BoardProps = GeneralBoardProps & {
     mouseX?: number | null;
@@ -52,7 +51,6 @@ export default function Board({
     onClick,
     onMouseMove,
     onMouseLeave,
-    onSelectedCellChange,
 }: BoardProps) {
     const boardRef = useRef(null) as RefObject<HTMLCanvasElement>;
     const prevSelectedCellRef = useRef([-1, -1]);
@@ -110,14 +108,13 @@ export default function Board({
         const [prevRow, prevCol] = prevSelectedCellRef.current;
         if (prevRow !== selectedRow || prevCol !== selectedCol) {
             prevSelectedCellRef.current = [selectedRow, selectedCol];
-            onSelectedCellChange?.([selectedRow, selectedCol]);
             mosaic.drawSelectedCell({
                 ctx,
                 selectedCol,
                 selectedRow,
             });
         }
-    }, [boardRef, mouseX, mouseY, mosaic, onSelectedCellChange]);
+    }, [boardRef, mouseX, mouseY, mosaic]);
 
     return (
         <StyledBoardCnt>

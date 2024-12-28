@@ -3,20 +3,20 @@ import { Dispatch } from '@reduxjs/toolkit';
 import styled from 'styled-components';
 import { throttle } from 'lodash';
 import { useSelector, useDispatch } from 'react-redux';
-import { selectPinShape, selectPinSize, setPinColor } from './redux/boardSlice';
+import { selectPinShape, selectPinSize } from './redux/board/boardSelectors';
+import { clearDraggedObject } from './redux/dnd/dndSlice';
 import {
     selectDraggedColor,
     selectDraggedType,
     selectDragStartMouseX,
     selectDragStartMouseY,
-    setMousePosition,
-    clearDragObject,
-} from './redux/dndSlice';
+} from './redux/dnd/dndSelectors';
 import Pin from './common/Pin';
 import Eraser from './common/Eraser';
 
 const StyledDraggedCnt = styled.div<{ $initialLeft: number; $initialTop: number }>`
     position: absolute;
+    pointer-events: none;
     left: ${(props) => props.$initialLeft}px;
     top: ${(props) => props.$initialTop}px;
 `;
@@ -32,8 +32,9 @@ export default function DraggedObject() {
 
     const pinCntRef = useRef(null) as RefObject<HTMLDivElement>;
 
-    const clearDraggedObject = useCallback(() => {
-        dispatch(clearDragObject());
+    const clearDND = useCallback(() => {
+        dispatch(clearDraggedObject());
+        return false;
     }, [dispatch]);
 
     const updateDraggedCoordinates = useCallback(
@@ -50,15 +51,8 @@ export default function DraggedObject() {
             const newPosition = _getPositionByCursor(positionLeft, positionTop, pinSize);
             pinCnt.style.left = `${newPosition.left}px`;
             pinCnt.style.top = `${newPosition.top}px`;
-
-            dispatch(
-                setMousePosition({
-                    mouseX: event.clientX,
-                    mouseY: event.clientY,
-                }),
-            );
         },
-        [dispatch, pinSize],
+        [pinSize],
     );
 
     useEffect(() => {
@@ -67,13 +61,15 @@ export default function DraggedObject() {
         }
         const throttledUpdateCallback = throttle(updateDraggedCoordinates, 20);
         document.onmousemove = throttledUpdateCallback;
-        document.onmouseleave = clearDraggedObject;
+        document.onmouseleave = clearDND;
+        document.oncontextmenu = clearDND;
 
         return () => {
             document.removeEventListener('onmousemove', throttledUpdateCallback);
-            document.removeEventListener('onmouseleave', clearDraggedObject);
+            document.removeEventListener('onmouseleave', clearDND);
+            document.removeEventListener('oncontextmenu', clearDND);
         };
-    }, [draggedType, clearDraggedObject, updateDraggedCoordinates]);
+    }, [draggedType, clearDND, updateDraggedCoordinates]);
 
     const initialPosition = _getPositionByCursor(dragStartMouseX, dragStartMouseY, pinSize);
 
@@ -93,20 +89,6 @@ export default function DraggedObject() {
             ref={pinCntRef}
             $initialLeft={initialPosition.left}
             $initialTop={initialPosition.top}
-            onContextMenu={(event) => {
-                event.preventDefault();
-                clearDraggedObject();
-            }}
-            onClick={() => {
-                if (draggedType === 'singlePin') {
-                    clearDraggedObject();
-                }
-                dispatch(
-                    setPinColor({
-                        color: pinColor,
-                    }),
-                );
-            }}
         >
             {objectToDrag}
         </StyledDraggedCnt>

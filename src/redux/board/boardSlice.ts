@@ -1,32 +1,17 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { PinShape, PinSizeAlias, GridColors, CellColor } from '../utils/mosaicTypes';
-import heartColors from '../utils/defaultPinsColors';
-import Mosaic from '../utils/mosaicClass';
-
-export const availableWidth = 1000;
-const availableHeight = 600;
-export const boardPadding = 5;
-export const pinPadding = 0;
-
-const sizeSettings = {
-    xs: 20,
-    s: 25,
-    m: 30,
-    l: 35,
-};
+import { PinShape, PinSizeAlias, GridColors } from '../../utils/mosaicTypes';
+import heartColors from '../../utils/defaultPinsColors';
+import Mosaic from '../../utils/mosaicClass';
+import { sizeSettings, pinPadding, boardPadding } from './utils';
 
 type BoardStateType = {
     pinShape: PinShape;
     pinSizeAlias: PinSizeAlias;
-    selectedRowIndex: number;
-    selectedColIndex: number;
     pinsColors: GridColors | null;
 };
 const initialState: BoardStateType = {
     pinShape: 'round',
     pinSizeAlias: 'm',
-    selectedRowIndex: -1,
-    selectedColIndex: -1,
     pinsColors: heartColors,
 };
 
@@ -39,12 +24,6 @@ export const boardSlice = createSlice({
         },
         setPinSizeAlias(state: BoardStateType, action: PayloadAction<PinSizeAlias>) {
             state.pinSizeAlias = action.payload;
-        },
-        setSelectedCell(
-            state: BoardStateType,
-            action: PayloadAction<[rowIndex: number, colIndex: number]>,
-        ) {
-            [state.selectedRowIndex, state.selectedColIndex] = action.payload;
         },
         clearBoard(state: BoardStateType) {
             const { pinsColors } = state;
@@ -83,22 +62,24 @@ export const boardSlice = createSlice({
             state.pinsColors = resizedPinsColors as GridColors;
         },
 
-        setPinColor(state: BoardStateType, action: PayloadAction<CellColor>) {
-            const { selectedRowIndex, selectedColIndex } = state;
-
-            if (state.pinsColors === null || selectedRowIndex < 0 || selectedColIndex < 0) {
+        setPinColor(
+            state: BoardStateType,
+            action: PayloadAction<{
+                rowIndex: number;
+                colIndex: number;
+                color: string | null;
+            }>,
+        ) {
+            const { rowIndex, colIndex, color } = action.payload;
+            if (state.pinsColors === null || rowIndex < 0 || colIndex < 0) {
                 return;
             }
 
-            if (
-                state.pinsColors[selectedRowIndex][selectedColIndex].color === action.payload.color
-            ) {
+            if (state.pinsColors[rowIndex][colIndex].color === color) {
                 return;
             }
 
-            state.pinsColors[selectedRowIndex][selectedColIndex] = action.payload;
-            state.selectedRowIndex = -1;
-            state.selectedColIndex = -1;
+            state.pinsColors[rowIndex][colIndex] = { color };
         },
 
         downloadImage(state: BoardStateType) {
@@ -162,50 +143,8 @@ export const boardSlice = createSlice({
             link.click();
         },
     },
-    selectors: {
-        selectPinShape(state: BoardStateType): PinShape {
-            return state.pinShape;
-        },
-        selectPinSizeAlias(state: BoardStateType) {
-            return state.pinSizeAlias;
-        },
-        selectPinSize(state: BoardStateType): number {
-            return sizeSettings[state.pinSizeAlias];
-        },
-        selectPinsColors(state: BoardStateType) {
-            return state.pinsColors;
-        },
-        selectPinsCount(state: BoardStateType) {
-            const pinSize = sizeSettings[state.pinSizeAlias];
-            const pinsCountW = Mosaic.getPinsInLineCount(
-                availableWidth - 2 * boardPadding,
-                pinSize,
-                pinPadding,
-            );
-            const pinsCountH = Mosaic.getPinsInLineCount(
-                availableHeight - 2 * boardPadding,
-                pinSize,
-                pinPadding,
-            );
-            return [pinsCountW, pinsCountH];
-        },
-    },
 });
 
-export const {
-    setPinShape,
-    setPinSizeAlias,
-    setSelectedCell,
-    setPinColor,
-    clearBoard,
-    resizeBoard,
-    downloadImage,
-} = boardSlice.actions;
-export const {
-    selectPinShape,
-    selectPinSize,
-    selectPinSizeAlias,
-    selectPinsColors,
-    selectPinsCount,
-} = boardSlice.selectors;
+export const { setPinShape, setPinSizeAlias, setPinColor, clearBoard, resizeBoard, downloadImage } =
+    boardSlice.actions;
 export default boardSlice.reducer;

@@ -1,10 +1,14 @@
 import { configureStore } from '@reduxjs/toolkit';
-import boardReducer from './boardSlice';
-import dndReducer from './dndSlice';
+import boardReducer from './board/boardSlice';
+import dndReducer from './dnd/dndSlice';
 
-export default configureStore({
+const store = configureStore({
     reducer: {
         board: boardReducer,
         dnd: dndReducer,
     },
 });
+
+export default store;
+export type StateType = ReturnType<typeof store.getState>;
+export type AppDispatch = typeof store.dispatch;

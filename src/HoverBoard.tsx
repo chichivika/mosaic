@@ -1,58 +1,29 @@
-import React, { MouseEvent, useRef, useState } from 'react';
-import { useSelector } from 'react-redux';
+import React, { MouseEvent, useState } from 'react';
 import { throttle } from 'lodash';
 import Board, { GeneralBoardProps } from './Board';
-import { selectDraggedType, selectMouseX, selectMouseY } from './redux/dndSlice';
 
 type MouseIndex = number | null;
-type HoverBoardProps = GeneralBoardProps & {
-    concernsForDND?: boolean;
-};
-export default function HoverBoard(props: HoverBoardProps) {
-    const { concernsForDND = false, ...boardProps } = props;
-
+export default function HoverBoard(props: GeneralBoardProps) {
     const [mouseX, setMouseX] = useState<MouseIndex>(null);
     const [mouseY, setMouseY] = useState<MouseIndex>(null);
-
-    const draggedType = useSelector(selectDraggedType);
-    const dragMouseX = useSelector(selectMouseX);
-    const dragMouseY = useSelector(selectMouseY);
-
-    const isDNDMode = concernsForDND && draggedType !== null;
-    const prevIsDNDModeRef = useRef(false);
 
     const clearMousePosition = () => {
         setMouseX(null);
         setMouseY(null);
     };
 
-    if (isDNDMode !== prevIsDNDModeRef.current) {
-        prevIsDNDModeRef.current = isDNDMode;
-        if (isDNDMode) {
-            clearMousePosition();
-        }
-    }
-
     return (
         <Board
-            {...boardProps}
-            mouseX={isDNDMode ? dragMouseX : mouseX}
-            mouseY={isDNDMode ? dragMouseY : mouseY}
-            onMouseMove={
-                isDNDMode
-                    ? undefined
-                    : throttle((event: MouseEvent) => {
-                          setMouseX(event.clientX);
-                          setMouseY(event.clientY);
-                      }, 100)
-            }
-            onMouseLeave={
-                isDNDMode
-                    ? undefined
-                    : () => {
-                          clearMousePosition();
-                      }
-            }
+            {...props}
+            mouseX={mouseX}
+            mouseY={mouseY}
+            onMouseMove={throttle((event: MouseEvent) => {
+                setMouseX(event.clientX);
+                setMouseY(event.clientY);
+            }, 100)}
+            onMouseLeave={() => {
+                clearMousePosition();
+            }}
         />
     );
 }

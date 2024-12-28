@@ -7,7 +7,7 @@ import EraserPicker, { StyledEraserPicker } from './EraserPicker';
 import ClearIcon from './ClearIcon';
 import DownloadIcon from './DownloadIcon';
 import { StyledIconButton } from '../common/IconButton';
-import { availableWidth } from '../redux/boardSlice';
+import { availableWidth } from '../redux/board/utils';
 
 const StyledOuterToolsCnt = styled.div`
     display: flex;

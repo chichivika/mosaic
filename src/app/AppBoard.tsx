@@ -1,23 +1,20 @@
 import React, { useEffect } from 'react';
-import { Dispatch } from '@reduxjs/toolkit';
 import { useSelector, useDispatch } from 'react-redux';
+import { resizeBoard } from '../redux/board/boardSlice';
 import {
     selectPinShape,
     selectPinSize,
-    setSelectedCell,
     selectPinsColors,
-    setPinColor,
     selectPinsCount,
-    boardPadding,
-    pinPadding,
-    resizeBoard,
-} from '../redux/boardSlice';
-import { initDragObject } from '../redux/dndSlice';
+} from '../redux/board/boardSelectors';
 import HoverBoard from '../HoverBoard';
 import { BoardClickEventObject } from '../Board';
+import { handleMosaicBoardClick } from '../redux/thunk';
+import { AppDispatch } from '../redux/store';
+import { boardPadding, pinPadding } from '../redux/board/utils';
 
 export default function AppBoard() {
-    const dispatch: Dispatch = useDispatch();
+    const dispatch: AppDispatch = useDispatch();
     const pinShape = useSelector(selectPinShape);
     const pinSize = useSelector(selectPinSize);
     const [pinsCountW, pinsCountH] = useSelector(selectPinsCount);
@@ -28,7 +25,6 @@ export default function AppBoard() {
 
     return (
         <HoverBoard
-            concernsForDND
             pinShape={pinShape}
             pinSize={pinSize}
             boardPadding={boardPadding}
@@ -36,20 +32,13 @@ export default function AppBoard() {
             pinsCountH={pinsCountH}
             pinPadding={pinPadding}
             pinsColors={useSelector(selectPinsColors)}
-            onSelectedCellChange={(cellInds) => {
-                dispatch(setSelectedCell(cellInds));
-            }}
             onClick={(event: BoardClickEventObject) => {
-                if (event.color === null) {
-                    return;
-                }
-                dispatch(setPinColor({ color: null }));
                 dispatch(
-                    initDragObject({
-                        draggedType: 'singlePin',
-                        draggedColor: event.color,
-                        dragStartMouseX: event.mouseX,
-                        dragStartMouseY: event.mouseY,
+                    handleMosaicBoardClick({
+                        rowIndex: event.rowIndex,
+                        colIndex: event.colIndex,
+                        mouseX: event.mouseX,
+                        mouseY: event.mouseY,
                     }),
                 );
             }}

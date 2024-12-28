@@ -7,8 +7,8 @@ import ChevronRightIcon from '@mui/icons-material/ChevronRight';
 import IconButton from '../common/IconButton';
 import { colorsPalette } from '../utils/mosaicPalette';
 import { PinShape, Palette } from '../utils/mosaicTypes';
-import { selectPinShape } from '../redux/boardSlice';
-import { initDragObject } from '../redux/dndSlice';
+import { selectPinShape } from '../redux/board/boardSelectors';
+import { initDraggedObject } from '../redux/dnd/dndSlice';
 import { BoardClickEventObject } from '../Board';
 import HoverBoard from '../HoverBoard';
 
@@ -77,7 +77,7 @@ function _startDragEvent({
     dispatch: Dispatch;
 }) {
     dispatch(
-        initDragObject({
+        initDraggedObject({
             draggedType: 'pin',
             draggedColor: pinsToDraw[eventParam.colIndex].color,
             dragStartMouseX: eventParam.mouseX,
