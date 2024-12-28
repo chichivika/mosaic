@@ -6,8 +6,9 @@ import PinPicker from './PinPicker';
 import EraserPicker, { StyledEraserPicker } from './EraserPicker';
 import ClearIcon from './ClearIcon';
 import DownloadIcon from './DownloadIcon';
-import { StyledIconButton } from '../common/IconButton';
 import { availableWidth } from '../redux/board/utils';
+import ColorBin, { StyledBinCnt } from './ColorBin';
+import { StyledIconButton } from '../common/IconButton';
 
 const StyledOuterToolsCnt = styled.div`
     display: flex;
@@ -28,9 +29,14 @@ const StyledToolsCnt = styled.div`
 const StyledPickerCnt = styled.div`
     display: flex;
     ${StyledEraserPicker} {
-        margin-left: 1rem;
         margin: 0.5rem;
     }
+    ${StyledBinCnt} {
+        margin: 0.5rem;
+    }
+`;
+
+const StyledToolCnt = styled.div`
     ${StyledIconButton} {
         margin: 0.5rem;
     }
@@ -50,9 +56,12 @@ function ToolPanel() {
                 <StyledPickerCnt>
                     <PinPicker />
                     <EraserPicker />
+                    <ColorBin />
+                </StyledPickerCnt>
+                <StyledToolCnt>
                     <ClearIcon />
                     <DownloadIcon />
-                </StyledPickerCnt>
+                </StyledToolCnt>
             </StyledToolsCnt>
         </StyledOuterToolsCnt>
     );

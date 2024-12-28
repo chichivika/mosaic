@@ -1,11 +1,8 @@
-import React, { useRef, useEffect, RefObject, useState } from 'react';
-import styled from 'styled-components';
-import { drawPolygon, drawLines, LightenDarkenColor } from '../utils/drawUtils';
+import React from 'react';
+import CanvasIcon from './CanvasIcon';
 import colors from '../styles/colors';
+import { drawPolygon, drawLinesChain, LightenDarkenColor } from '../utils/drawUtils';
 
-export const StyledCanvas = styled.canvas`
-    cursor: pointer;
-`;
 export default function Eraser({
     width = 28,
     useHoverStyle = false,
@@ -13,47 +10,30 @@ export default function Eraser({
     width?: number;
     useHoverStyle?: boolean;
 }) {
-    const canvasRef = useRef(null) as RefObject<HTMLCanvasElement>;
-    const [isHovered, setIsHovered] = useState(false);
-
-    useEffect(() => {
-        const canvas = canvasRef.current;
-        if (canvas === null) {
-            return;
-        }
-        const ctx = canvas.getContext('2d');
-        if (ctx === null) {
-            return;
-        }
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
-        _drawEraser(ctx, width, isHovered);
-    }, [width, isHovered]);
-
+    const height = (7 * width) / 8;
     return (
-        <StyledCanvas
-            ref={canvasRef}
+        <CanvasIcon
+            useHoverStyle={useHoverStyle}
             width={width}
-            height={width}
-            onMouseOver={
-                useHoverStyle
-                    ? () => {
-                          setIsHovered(true);
-                      }
-                    : undefined
-            }
-            onMouseLeave={
-                useHoverStyle
-                    ? () => {
-                          setIsHovered(false);
-                      }
-                    : undefined
-            }
+            height={height + 5}
+            onDrawIcon={(param) => {
+                _drawEraser({ ...param, width, height });
+            }}
         />
     );
 }
 
-function _drawEraser(ctx: CanvasRenderingContext2D, width: number, isHovered: boolean) {
-    const height = (7 * width) / 8;
+function _drawEraser({
+    ctx,
+    width,
+    height,
+    isHovered,
+}: {
+    ctx: CanvasRenderingContext2D;
+    width: number;
+    height: number;
+    isHovered: boolean;
+}) {
     ctx.strokeStyle = colors.fontColor;
     ctx.fillStyle = colors.fontColor;
 
@@ -72,7 +52,7 @@ function _drawEraser(ctx: CanvasRenderingContext2D, width: number, isHovered: bo
 
     ctx.beginPath();
     ctx.fillStyle = colors.bgColor;
-    drawLines({
+    drawLinesChain({
         ctx,
         verts: [
             [width / 4, (3 * height) / 7],

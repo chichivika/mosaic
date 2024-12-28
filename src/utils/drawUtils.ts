@@ -10,6 +10,22 @@ export type DrawPinParam = {
     useStrokeIfNotSelected?: boolean;
 };
 
+export function getVectorsDelta(firstPoint: Point, secondPoint: Point): Point {
+    return [secondPoint[0] - firstPoint[0], secondPoint[1] - firstPoint[1]];
+}
+
+export function getVectorsSum(
+    firstPoint: Point,
+    secondPoint: Point,
+    firstCoeff: number = 1,
+    secondCoeff: number = 1,
+): Point {
+    return [
+        firstCoeff * firstPoint[0] + secondCoeff * secondPoint[0],
+        firstCoeff * firstPoint[1] + secondCoeff * secondPoint[1],
+    ];
+}
+
 export function drawRoundArc({
     ctx,
     cx,
@@ -47,11 +63,11 @@ export function drawPolygon({ ctx, verts }: { ctx: CanvasRenderingContext2D; ver
         return;
     }
 
-    drawLines({ ctx, verts });
+    drawLinesChain({ ctx, verts });
     ctx.closePath();
 }
 
-export function drawLines({ ctx, verts }: { ctx: CanvasRenderingContext2D; verts: Points }) {
+export function drawLinesChain({ ctx, verts }: { ctx: CanvasRenderingContext2D; verts: Points }) {
     if (verts.length === 0) {
         return;
     }
@@ -62,6 +78,14 @@ export function drawLines({ ctx, verts }: { ctx: CanvasRenderingContext2D; verts
             return;
         }
         ctx.lineTo(vert[0], vert[1]);
+    });
+}
+
+export function drawLines({ ctx, lines }: { ctx: CanvasRenderingContext2D; lines: Points[] }) {
+    lines.forEach((line) => {
+        const [firstVert, secondVert] = line;
+        ctx.moveTo(firstVert[0], firstVert[1]);
+        ctx.lineTo(secondVert[0], secondVert[1]);
     });
 }
 
@@ -329,7 +353,7 @@ export function drawRoundGem(param: DrawPinParam) {
         ctx.beginPath();
         ctx.fillStyle = LightenDarkenColor(cellColor, fillStylesIndex[i]);
         const nextIndex = i === innerHexagonPoints.length - 1 ? 0 : i + 1;
-        drawLines({
+        drawLinesChain({
             ctx,
             verts: [
                 outerHexagonPoints[i],
@@ -379,7 +403,7 @@ function drawHightLight({
     const rotateCoefficient = rotate ? 0 : 1;
 
     ctx.beginPath();
-    drawLines({
+    drawLinesChain({
         ctx,
         verts: [
             [cx - rotateCoefficient * lightLength, cy - lightLength],
@@ -389,7 +413,7 @@ function drawHightLight({
     ctx.stroke();
 
     ctx.beginPath();
-    drawLines({
+    drawLinesChain({
         ctx,
         verts: [
             [cx + lightLength, cy - rotateCoefficient * lightLength],
