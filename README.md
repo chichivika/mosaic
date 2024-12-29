@@ -4,7 +4,7 @@ Desktop application using React + Typescript.
 Do you remember that mosaic from your childhood with white board and colorful pins? Here it is.
 Get fun creating your own mosaic image. Try different types and shapes of the pins. Download the image and use it anywhere.
 
-<img src="public/mosaic_screen_board.JPG" width="800"/>
+<img src="public/mosaicScreen.JPG" width="800"/>
 
 <p>
 <img src="public/mosaicHeart1.png" width="200" />
