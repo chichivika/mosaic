@@ -29,11 +29,11 @@ export default function Bin({
     const prevWidthRef = useRef<number | null>(null);
     const prevDisabledRef = useRef<boolean>(disabled);
     const [width, setWidth] = useState(defaultWidth);
-
     const fullWidth = useWidthAnimation ? Math.max(defaultWidth, hoverWidth) + 5 : defaultWidth + 5;
+
     if (prevDisabledRef.current !== disabled) {
-        prevDisabledRef.current = disabled;
-        if (disabled) {
+        if (disabled && width !== defaultWidth) {
+            prevDisabledRef.current = disabled;
             setWidth(defaultWidth);
         }
     }
@@ -48,39 +48,86 @@ export default function Bin({
             return;
         }
 
-        if (!useWidthAnimation || prevWidthRef.current === null) {
+        if (prevWidthRef.current === null) {
             ctx.clearRect(0, 0, canvas.width, canvas.height);
-            _drawBin({ ctx, width, fullWidth, disabled, throwedColor });
+            _drawBin({ ctx, width, fullWidth, disabledFraction: disabled ? 1 : 0, throwedColor });
             prevWidthRef.current = width;
             return;
         }
 
-        const prevWidth = prevWidthRef.current as number;
-        const start = performance.now();
-        const duration = 200;
-        let animationFrameId: number;
+        if (useWidthAnimation && prevWidthRef.current !== width) {
+            const prevWidth = prevWidthRef.current as number;
+            const start = performance.now();
+            const duration = 200;
+            let animationFrameId: number;
 
-        const animate = () => {
-            const timeFraction = (performance.now() - start) / duration;
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            const animate = () => {
+                const timeFraction = (performance.now() - start) / duration;
+                const isFinish = timeFraction >= 1;
+                const newWidth = isFinish ? width : prevWidth + timeFraction * (width - prevWidth);
+                prevWidthRef.current = newWidth;
 
-            if (timeFraction >= 1) {
-                _drawBin({ ctx, width, fullWidth, disabled, throwedColor });
-                prevWidthRef.current = width;
-                return;
-            }
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                _drawBin({
+                    ctx,
+                    width: newWidth,
+                    fullWidth,
+                    disabledFraction: disabled ? 1 : 0,
+                    throwedColor,
+                });
 
-            const newWidth = prevWidth + timeFraction * (width - prevWidth);
-            _drawBin({ ctx, width: newWidth, fullWidth, disabled, throwedColor });
+                if (!isFinish) {
+                    animationFrameId = requestAnimationFrame(animate);
+                }
+            };
             animationFrameId = requestAnimationFrame(animate);
-        };
-        animationFrameId = requestAnimationFrame(animate);
 
-        return () => {
-            if (typeof animationFrameId === 'number') {
-                cancelAnimationFrame(animationFrameId);
-            }
-        };
+            return () => {
+                if (typeof animationFrameId === 'number') {
+                    cancelAnimationFrame(animationFrameId);
+                }
+            };
+        }
+
+        if (prevDisabledRef.current !== disabled) {
+            const start = performance.now();
+            const duration = 200;
+            let animationFrameId: number;
+
+            const animate = () => {
+                const timeFraction = (performance.now() - start) / duration;
+                const isFinish = timeFraction >= 1;
+
+                let disabledFraction: number;
+                if (!isFinish) {
+                    disabledFraction = disabled ? timeFraction : 1 - timeFraction;
+                } else {
+                    disabledFraction = disabled ? 1 : 0;
+                    prevDisabledRef.current = disabled;
+                }
+
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                _drawBin({
+                    ctx,
+                    width,
+                    fullWidth,
+                    disabledFraction,
+                    throwedColor,
+                });
+
+                if (!isFinish) {
+                    animationFrameId = requestAnimationFrame(animate);
+                }
+            };
+            animationFrameId = requestAnimationFrame(animate);
+
+            return () => {
+                if (typeof animationFrameId === 'number') {
+                    cancelAnimationFrame(animationFrameId);
+                    prevDisabledRef.current = disabled;
+                }
+            };
+        }
     }, [width, fullWidth, throwedColor, disabled, useWidthAnimation]);
 
     const ignoreHover = !useWidthAnimation || disabled;
@@ -94,13 +141,15 @@ export default function Bin({
                 ignoreHover
                     ? undefined
                     : () => {
+                          console.log('onMouseOver');
                           setWidth(hoverWidth);
                       }
             }
-            onMouseLeave={
+            onMouseOut={
                 ignoreHover
                     ? undefined
                     : () => {
+                          console.log('onMouseOut');
                           setWidth(defaultWidth);
                       }
             }
@@ -116,14 +165,16 @@ function _drawBin({
     ctx,
     width,
     fullWidth,
-    disabled,
+    disabledFraction,
     throwedColor,
     isHovered = false,
 }: {
     ctx: CanvasRenderingContext2D;
     width: number;
     fullWidth: number;
-    disabled: boolean;
+    // number from 0 to 1,
+    // where 1 is disabled and 0 is not disabled
+    disabledFraction: number;
     throwedColor: string | null;
     isHovered?: boolean;
 }) {
@@ -147,10 +198,13 @@ function _drawBin({
     const rightCenter = getVectorsSum(rightBottom, rightSide, 1, 0.2);
 
     const binVerts = [leftTop, rightTop, rightBottom, leftBottom];
+    const disabledColorCoeff = disabledFraction / 2;
 
     if (throwedColor !== null) {
         ctx.beginPath();
-        ctx.fillStyle = disabled ? LightenDarkenColor(throwedColor, 0.5) : throwedColor;
+        ctx.fillStyle = disabledColorCoeff
+            ? LightenDarkenColor(throwedColor, disabledColorCoeff)
+            : throwedColor;
         ctx.arc(
             fullWidth / 2,
             rightCenter[1],
@@ -165,9 +219,9 @@ function _drawBin({
     ctx.strokeStyle = colors.fontColor;
     ctx.fillStyle = colors.fontColor;
 
-    if (disabled) {
-        ctx.strokeStyle = LightenDarkenColor(colors.fontColor, 0.5);
-        ctx.fillStyle = LightenDarkenColor(colors.fontColor, 0.5);
+    if (disabledColorCoeff) {
+        ctx.strokeStyle = LightenDarkenColor(colors.fontColor, disabledColorCoeff);
+        ctx.fillStyle = LightenDarkenColor(colors.fontColor, disabledColorCoeff);
     } else if (isHovered) {
         ctx.strokeStyle = LightenDarkenColor(colors.fontColor, -0.2);
     }
@@ -235,7 +289,7 @@ function _drawBin({
     });
     ctx.stroke();
 
-    if (!disabled && isHovered) {
+    if (!disabledColorCoeff && isHovered) {
         ctx.beginPath();
         drawPolygon({
             ctx,

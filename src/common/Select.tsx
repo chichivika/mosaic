@@ -13,7 +13,7 @@ export const StyledUiSelect = styled(UiSelect)<{ $width?: string }>`
         font-weight: 600;
 
         :is(.MuiSelect-select, .MuiSvgIcon-root) {
-            transition: color 1s;
+            transition: color 0.5s;
         }
     }
     fieldset {
