@@ -18,11 +18,15 @@ export default function ColorBin() {
     const isDNDMode = useSelector(selectIsDNDMode);
     const [throwedColor, setThrowedColor] = useState<string | null>(null);
 
+    const disabled = !isDNDMode;
     return (
         <Tooltip title={isDNDMode ? 'Throw out' : ''}>
             <StyledBinCnt
                 $padding={isDNDMode ? '0px' : '0px 5px'}
                 onClick={() => {
+                    if (disabled) {
+                        return;
+                    }
                     const draggedColor = selectDraggedColor(getCurrentState());
                     setThrowedColor(draggedColor);
                     dispatch(clearDraggedObject());
@@ -30,7 +34,7 @@ export default function ColorBin() {
             >
                 <Bin
                     useHoverStyle
-                    disabled={!isDNDMode}
+                    disabled={disabled}
                     width={isDNDMode ? 30 : 20}
                     throwedColor={throwedColor}
                 />
