@@ -13,24 +13,30 @@ import { Point, Points } from '../utils/mosaicTypes';
 import { StyledCanvas } from './CanvasIcon';
 
 export default function Bin({
-    width = 20,
-    fullWidth = 30,
-    useHoverStyle = false,
+    defaultWidth = 20,
+    hoverWidth = 20,
     disabled = false,
     throwedColor = null,
     useWidthAnimation = false,
 }: {
-    width?: number;
-    fullWidth?: number;
-    useHoverStyle?: boolean;
+    defaultWidth?: number;
+    hoverWidth?: number;
     disabled?: boolean;
     throwedColor?: string | null;
     useWidthAnimation?: boolean;
 }) {
     const canvasRef = useRef(null) as RefObject<HTMLCanvasElement>;
     const prevWidthRef = useRef<number | null>(null);
-    const animationProgressRef = useRef<boolean>(false);
-    const [isHovered, setIsHovered] = useState(false);
+    const prevDisabledRef = useRef<boolean>(disabled);
+    const [width, setWidth] = useState(defaultWidth);
+
+    const fullWidth = useWidthAnimation ? Math.max(defaultWidth, hoverWidth) + 5 : defaultWidth + 5;
+    if (prevDisabledRef.current !== disabled) {
+        prevDisabledRef.current = disabled;
+        if (disabled) {
+            setWidth(defaultWidth);
+        }
+    }
 
     useEffect(() => {
         const canvas = canvasRef.current;
@@ -44,15 +50,14 @@ export default function Bin({
 
         if (!useWidthAnimation || prevWidthRef.current === null) {
             ctx.clearRect(0, 0, canvas.width, canvas.height);
-            _drawBin({ ctx, isHovered, width, fullWidth, disabled, throwedColor });
+            _drawBin({ ctx, width, fullWidth, disabled, throwedColor });
             prevWidthRef.current = width;
             return;
         }
 
-        animationProgressRef.current = true;
         const prevWidth = prevWidthRef.current as number;
         const start = performance.now();
-        const duration = 500;
+        const duration = 200;
         let animationFrameId: number;
 
         const animate = () => {
@@ -60,14 +65,13 @@ export default function Bin({
             ctx.clearRect(0, 0, canvas.width, canvas.height);
 
             if (timeFraction >= 1) {
-                _drawBin({ ctx, isHovered, width, fullWidth, disabled, throwedColor });
+                _drawBin({ ctx, width, fullWidth, disabled, throwedColor });
                 prevWidthRef.current = width;
-                animationProgressRef.current = false;
                 return;
             }
 
             const newWidth = prevWidth + timeFraction * (width - prevWidth);
-            _drawBin({ ctx, isHovered, width: newWidth, fullWidth, disabled, throwedColor });
+            _drawBin({ ctx, width: newWidth, fullWidth, disabled, throwedColor });
             animationFrameId = requestAnimationFrame(animate);
         };
         animationFrameId = requestAnimationFrame(animate);
@@ -75,12 +79,11 @@ export default function Bin({
         return () => {
             if (typeof animationFrameId === 'number') {
                 cancelAnimationFrame(animationFrameId);
-                animationProgressRef.current = false;
             }
         };
-    }, [width, fullWidth, isHovered, throwedColor, disabled, useWidthAnimation]);
+    }, [width, fullWidth, throwedColor, disabled, useWidthAnimation]);
 
-    const ignoreHover = !useHoverStyle || disabled;
+    const ignoreHover = !useWidthAnimation || disabled;
     return (
         <StyledCanvas
             ref={canvasRef}
@@ -91,18 +94,14 @@ export default function Bin({
                 ignoreHover
                     ? undefined
                     : () => {
-                          if (!animationProgressRef.current) {
-                              setIsHovered(true);
-                          }
+                          setWidth(hoverWidth);
                       }
             }
             onMouseLeave={
                 ignoreHover
                     ? undefined
                     : () => {
-                          if (!animationProgressRef.current) {
-                              setIsHovered(false);
-                          }
+                          setWidth(defaultWidth);
                       }
             }
         />
@@ -117,16 +116,16 @@ function _drawBin({
     ctx,
     width,
     fullWidth,
-    isHovered,
     disabled,
     throwedColor,
+    isHovered = false,
 }: {
     ctx: CanvasRenderingContext2D;
     width: number;
     fullWidth: number;
-    isHovered: boolean;
     disabled: boolean;
     throwedColor: string | null;
+    isHovered?: boolean;
 }) {
     if (fullWidth < width) {
         return;
