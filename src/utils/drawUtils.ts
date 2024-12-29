@@ -10,6 +10,23 @@ export type DrawPinParam = {
     useStrokeIfNotSelected?: boolean;
 };
 
+export function getLinesIntersection(
+    firstPoint: Point,
+    secondPoint: Point,
+    firstVector: Point,
+    secondVector: Point,
+): Point | null {
+    const vectorPoroduct = firstVector[1] * secondVector[0] - secondVector[1] * firstVector[0];
+    if (vectorPoroduct < 0.000001 && vectorPoroduct > -0.000001) {
+        return null;
+    }
+    const coeff =
+        ((secondPoint[1] - firstPoint[1]) * firstVector[0] -
+            (secondPoint[0] - firstPoint[0]) * firstVector[1]) /
+        vectorPoroduct;
+    return getVectorsSum(secondPoint, secondVector, 1, coeff);
+}
+
 export function getVectorsDelta(firstPoint: Point, secondPoint: Point): Point {
     return [secondPoint[0] - firstPoint[0], secondPoint[1] - firstPoint[1]];
 }

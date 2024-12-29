@@ -7,17 +7,20 @@ import {
     getVectorsDelta,
     getVectorsSum,
     drawLines,
+    getLinesIntersection,
 } from '../utils/drawUtils';
-import { Point } from '../utils/mosaicTypes';
+import { Point, Points } from '../utils/mosaicTypes';
 
 export default function Bin({
     width = 20,
     useHoverStyle = false,
     disabled = false,
+    throwedColor = null,
 }: {
     width?: number;
     useHoverStyle?: boolean;
     disabled?: boolean;
+    throwedColor?: string | null;
 }) {
     const height = (5 * width) / 4;
     return (
@@ -27,7 +30,7 @@ export default function Bin({
             height={height + 1}
             disabled={disabled}
             onDrawIcon={(param) => {
-                _drawBin({ ...param, width, height, disabled });
+                _drawBin({ ...param, width, height, disabled, throwedColor });
             }}
         />
     );
@@ -39,13 +42,41 @@ function _drawBin({
     height,
     isHovered,
     disabled,
+    throwedColor,
 }: {
     ctx: CanvasRenderingContext2D;
     width: number;
     height: number;
     isHovered: boolean;
     disabled: boolean;
+    throwedColor: string | null;
 }) {
+    const leftTop: Point = [0, 0];
+    const rightTop: Point = [width, 0];
+    const leftBottom: Point = [(1 * width) / 8, height];
+    const rightBottom: Point = [(7 * width) / 8, height];
+
+    const leftSide = getVectorsDelta(leftBottom, leftTop);
+    const rightSide = getVectorsDelta(rightBottom, rightTop);
+    const leftCenter = getVectorsSum(leftBottom, leftSide, 1, 0.2);
+    const rightCenter = getVectorsSum(rightBottom, rightSide, 1, 0.2);
+
+    const binVerts = [leftTop, rightTop, rightBottom, leftBottom];
+
+    if (throwedColor !== null) {
+        ctx.beginPath();
+        ctx.fillStyle = disabled ? LightenDarkenColor(throwedColor, 0.5) : throwedColor;
+        ctx.arc(
+            width / 2,
+            rightCenter[1],
+            0.4 * (rightCenter[0] - leftCenter[0]),
+            0,
+            Math.PI,
+            true,
+        );
+        ctx.fill();
+    }
+
     ctx.strokeStyle = colors.fontColor;
     ctx.fillStyle = colors.fontColor;
 
@@ -56,47 +87,44 @@ function _drawBin({
         ctx.strokeStyle = LightenDarkenColor(colors.fontColor, -0.2);
     }
 
-    const leftTop: Point = [0, 0];
-    const rightTop: Point = [width, 0];
-    const leftBottom: Point = [(3 * width) / 16, height];
-    const rightBottom: Point = [(13 * width) / 16, height];
-
-    const leftSide = getVectorsDelta(leftBottom, leftTop);
-    const rightSide = getVectorsDelta(rightBottom, rightTop);
-    const leftCenter = getVectorsSum(leftBottom, leftSide, 1, 0.2);
-    const rightCenter = getVectorsSum(rightBottom, rightSide, 1, 0.2);
-
-    const binVerts = [leftTop, rightTop, rightBottom, leftBottom];
+    const getIntersectWithHorisontalLine = (
+        startPoint: Point,
+        yValue: number,
+        lineVector: Point,
+    ): Point | null => {
+        const intersectPoint = [
+            startPoint[0] + ((yValue - startPoint[1]) * lineVector[0]) / lineVector[1],
+            yValue,
+        ] as Point;
+        if (intersectPoint[0] < 0) {
+            return getLinesIntersection(startPoint, leftBottom, lineVector, leftSide);
+        }
+        if (intersectPoint[0] > width) {
+            return getLinesIntersection(startPoint, rightBottom, lineVector, rightSide);
+        }
+        return intersectPoint;
+    };
 
     ctx.beginPath();
+
+    const linesToDraw: Points[] = [];
+    for (let i = -10; i < 10; i += 2) {
+        const rightPoint = getVectorsSum(rightBottom, rightSide, 1, i / 10);
+        const topIntersectPoint = getIntersectWithHorisontalLine(rightPoint, 0, [-1, -1]);
+        if (topIntersectPoint !== null) {
+            linesToDraw.push([rightPoint, topIntersectPoint]);
+        }
+
+        const leftPoint = getVectorsSum(leftBottom, leftSide, 1, i / 10);
+        const leftIntersectPoint = getIntersectWithHorisontalLine(leftPoint, 0, [1, -1]);
+        if (leftIntersectPoint !== null) {
+            linesToDraw.push([leftPoint, leftIntersectPoint]);
+        }
+    }
+
     drawLines({
         ctx,
-        lines: [
-            [
-                [width / 4, leftCenter[1]],
-                [width / 4, 0],
-            ],
-            [
-                [width / 2, leftCenter[1]],
-                [width / 2, 0],
-            ],
-            [
-                [(3 * width) / 4, rightCenter[1]],
-                [(3 * width) / 4, 0],
-            ],
-            [
-                getVectorsSum(leftBottom, leftSide, 1, 0.4),
-                getVectorsSum(rightBottom, rightSide, 1, 0.4),
-            ],
-            [
-                getVectorsSum(leftBottom, leftSide, 1, 0.6),
-                getVectorsSum(rightBottom, rightSide, 1, 0.6),
-            ],
-            [
-                getVectorsSum(leftBottom, leftSide, 1, 0.8),
-                getVectorsSum(rightBottom, rightSide, 1, 0.8),
-            ],
-        ],
+        lines: linesToDraw,
     });
     ctx.stroke();
 
