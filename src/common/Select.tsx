@@ -11,6 +11,10 @@ export const StyledUiSelect = styled(UiSelect)<{ $width?: string }>`
     &.MuiInputBase-root {
         color: ${(props) => props.theme.fontColor};
         font-weight: 600;
+
+        :is(.MuiSelect-select, .MuiSvgIcon-root) {
+            transition: color 1s;
+        }
     }
     fieldset {
         border: 0px;

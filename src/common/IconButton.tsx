@@ -6,6 +6,7 @@ export const StyledIconButton = styled(UiIconButton)`
     &.MuiButtonBase-root.MuiIconButton-root {
         padding: 0px;
         color: ${(props) => props.theme.fontColor};
+        transition: color 1s;
         &.Mui-disabled {
             color: ${(props) => props.theme.fontDisabledColor};
             &:hover {

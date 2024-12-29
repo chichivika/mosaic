@@ -5,24 +5,22 @@ import { Dispatch } from '@reduxjs/toolkit';
 import { useDispatch, useSelector } from 'react-redux';
 import { clearDraggedObject } from '../redux/dnd/dndSlice';
 import Bin from '../common/Bin';
-import { selectIsDNDMode, selectDraggedColor } from '../redux/dnd/dndSelectors';
+import { selectDraggedType, selectDraggedColor } from '../redux/dnd/dndSelectors';
 import { getCurrentState } from '../redux/store';
 
-export const StyledBinCnt = styled.div<{ $padding: string }>`
+export const StyledBinCnt = styled.div`
     display: flex;
     align-items: center;
-    padding: ${(props) => props.$padding};
 `;
 export default function ColorBin() {
     const dispatch: Dispatch = useDispatch();
-    const isDNDMode = useSelector(selectIsDNDMode);
+    const draggedType = useSelector(selectDraggedType);
     const [throwedColor, setThrowedColor] = useState<string | null>(null);
 
-    const disabled = !isDNDMode;
+    const disabled = draggedType !== 'pin' && draggedType !== 'eraser';
     return (
-        <Tooltip title={isDNDMode ? 'Throw out' : ''}>
+        <Tooltip title={disabled ? '' : 'Throw out'}>
             <StyledBinCnt
-                $padding={isDNDMode ? '0px' : '0px 5px'}
                 onClick={() => {
                     if (disabled) {
                         return;
@@ -33,9 +31,9 @@ export default function ColorBin() {
                 }}
             >
                 <Bin
-                    useHoverStyle
+                    useWidthAnimation
                     disabled={disabled}
-                    width={isDNDMode ? 30 : 20}
+                    width={disabled ? 18 : 25}
                     throwedColor={throwedColor}
                 />
             </StyledBinCnt>
