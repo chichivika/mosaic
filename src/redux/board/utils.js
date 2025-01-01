@@ -3,9 +3,6 @@ export const availableHeight = 600;
 export const boardPadding = 5;
 export const pinPadding = 0;
 
-export const sizeSettings = {
-    xs: 20,
-    s: 25,
-    m: 30,
-    l: 35,
-};
+export const minPinSize = 20;
+export const maxPinSize = 50;
+export const pinSizeStep = 2;

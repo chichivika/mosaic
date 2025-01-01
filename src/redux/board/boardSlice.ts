@@ -1,17 +1,17 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { PinShape, PinSizeAlias, GridColors } from '../../utils/mosaicTypes';
+import { PinShape, GridColors } from '../../utils/mosaicTypes';
 import heartColors from '../../utils/defaultPinsColors';
 import Mosaic from '../../utils/mosaicClass';
-import { sizeSettings, pinPadding, boardPadding } from './utils';
+import { pinPadding, boardPadding, minPinSize, maxPinSize, pinSizeStep } from './utils';
 
 type BoardStateType = {
     pinShape: PinShape;
-    pinSizeAlias: PinSizeAlias;
+    pinSize: number;
     pinsColors: GridColors | null;
 };
 const initialState: BoardStateType = {
     pinShape: 'round',
-    pinSizeAlias: 'm',
+    pinSize: 30,
     pinsColors: heartColors,
 };
 
@@ -22,8 +22,13 @@ export const boardSlice = createSlice({
         setPinShape(state: BoardStateType, action: PayloadAction<PinShape>) {
             state.pinShape = action.payload;
         },
-        setPinSizeAlias(state: BoardStateType, action: PayloadAction<PinSizeAlias>) {
-            state.pinSizeAlias = action.payload;
+        increasePinSize(state: BoardStateType, action: PayloadAction<boolean>) {
+            const coeff = action.payload ? 1 : -1;
+            const newPinSize = state.pinSize + coeff * pinSizeStep;
+            if (newPinSize < minPinSize || newPinSize > maxPinSize) {
+                return;
+            }
+            state.pinSize = newPinSize;
         },
         clearBoard(state: BoardStateType) {
             const { pinsColors } = state;
@@ -119,7 +124,7 @@ export const boardSlice = createSlice({
             const mosaic = new Mosaic({
                 pinPadding,
                 pinShape: state.pinShape,
-                pinSize: sizeSettings[state.pinSizeAlias],
+                pinSize: state.pinSize,
                 pinsCountW: imgPinsCountW,
                 pinsCountH: imgPinsCountH,
                 pinsColors: imgPinsColors,
@@ -145,6 +150,6 @@ export const boardSlice = createSlice({
     },
 });
 
-export const { setPinShape, setPinSizeAlias, setPinColor, clearBoard, resizeBoard, downloadImage } =
+export const { setPinShape, increasePinSize, setPinColor, clearBoard, resizeBoard, downloadImage } =
     boardSlice.actions;
 export default boardSlice.reducer;

@@ -1,6 +1,5 @@
 import React from 'react';
 import styled from 'styled-components';
-import SizeSelect from './SizeSelect';
 import ShapeSelect from './ShapeSelect';
 import PinPicker from './PinPicker';
 import EraserPicker, { StyledEraserPicker } from './EraserPicker';
@@ -42,18 +41,12 @@ const StyledToolCnt = styled.div`
     }
 `;
 
-const StyledSelectorsCnt = styled.div`
-    display: flex;
-`;
 function ToolPanel() {
     return (
         <StyledOuterToolsCnt>
             <StyledToolsCnt>
-                <StyledSelectorsCnt>
-                    <ShapeSelect />
-                    <SizeSelect />
-                </StyledSelectorsCnt>
                 <StyledPickerCnt>
+                    <ShapeSelect />
                     <PinPicker />
                     <EraserPicker />
                     <ColorBin />

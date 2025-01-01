@@ -1,4 +1,12 @@
-import React, { useEffect, useRef, useMemo, RefObject, MouseEvent, MutableRefObject } from 'react';
+import React, {
+    useEffect,
+    useRef,
+    useMemo,
+    RefObject,
+    MouseEvent,
+    MutableRefObject,
+    WheelEvent,
+} from 'react';
 import styled from 'styled-components';
 import Mosaic from './utils/mosaicClass';
 import { PinShape, GridColors } from './utils/mosaicTypes';
@@ -23,6 +31,7 @@ export type GeneralBoardProps = {
     pinPadding?: number;
     emptyColor?: string;
     onClick?: BoardClickCallback;
+    onWheel?: (param: WheelEvent) => void;
 };
 type BoardProps = GeneralBoardProps & {
     mouseX?: number | null;
@@ -51,6 +60,7 @@ export default function Board({
     onClick,
     onMouseMove,
     onMouseLeave,
+    onWheel,
 }: BoardProps) {
     const boardRef = useRef(null) as RefObject<HTMLCanvasElement>;
     const prevSelectedCellRef = useRef([-1, -1]);
@@ -117,7 +127,7 @@ export default function Board({
     }, [boardRef, mouseX, mouseY, mosaic]);
 
     return (
-        <StyledBoardCnt>
+        <StyledBoardCnt onWheel={onWheel}>
             <canvas
                 ref={boardRef}
                 width={mosaic.getBoardWidth()}

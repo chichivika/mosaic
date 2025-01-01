@@ -1,6 +1,6 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, WheelEvent } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
-import { resizeBoard } from '../redux/board/boardSlice';
+import { resizeBoard, increasePinSize } from '../redux/board/boardSlice';
 import {
     selectPinShape,
     selectPinSize,
@@ -41,6 +41,11 @@ export default function AppBoard() {
                         mouseY: event.mouseY,
                     }),
                 );
+            }}
+            onWheel={(event: WheelEvent) => {
+                event.preventDefault();
+                const needIncrease = event.deltaY < 0;
+                dispatch(increasePinSize(needIncrease));
             }}
         />
     );
