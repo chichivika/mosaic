@@ -127,7 +127,7 @@ export default function Board({
     }, [boardRef, mouseX, mouseY, mosaic]);
 
     return (
-        <StyledBoardCnt onWheel={onWheel}>
+        <StyledBoardCnt>
             <canvas
                 ref={boardRef}
                 width={mosaic.getBoardWidth()}
@@ -139,6 +139,7 @@ export default function Board({
                 }
                 onMouseMove={onMouseMove}
                 onMouseLeave={onMouseLeave}
+                onWheel={onWheel}
             />
         </StyledBoardCnt>
     );
