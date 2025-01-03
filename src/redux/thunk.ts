@@ -28,7 +28,7 @@ export const handleMosaicBoardClick = ({
         }
 
         const draggedType = selectDraggedType(state);
-        const selectedCell = pinsColors[rowIndex][colIndex];
+        const selectedCell = pinsColors[rowIndex]?.[colIndex];
         if (!selectedCell) {
             return;
         }
