@@ -7,7 +7,7 @@ import ClearIcon from './ClearIcon';
 import DownloadIcon from './DownloadIcon';
 import { availableWidth } from '../redux/board/utils';
 import ColorBin, { StyledBinCnt } from './ColorBin';
-import { StyledIconButton } from '../common/IconButton';
+import ZoomTool from './ZoomTool';
 
 const StyledOuterToolsCnt = styled.div`
     display: flex;
@@ -36,7 +36,7 @@ const StyledPickerCnt = styled.div`
 `;
 
 const StyledToolCnt = styled.div`
-    ${StyledIconButton} {
+    & > :is(button, div) {
         margin: 0.5rem;
     }
 `;
@@ -52,6 +52,7 @@ function ToolPanel() {
                     <ColorBin />
                 </StyledPickerCnt>
                 <StyledToolCnt>
+                    <ZoomTool />
                     <ClearIcon />
                     <DownloadIcon />
                 </StyledToolCnt>

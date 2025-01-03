@@ -1,18 +1,17 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { PinShape, GridColors } from '../../utils/mosaicTypes';
-import heartColors from '../../utils/defaultPinsColors';
-import Mosaic from '../../utils/mosaicClass';
-import { pinPadding, boardPadding, minPinSize, maxPinSize, pinSizeStep } from './utils';
+import { PinShape, MosaicImage } from '../../utils/mosaicTypes';
+import heartImage from '../../utils/defaultMosaicImage';
+import { minPinSize, maxPinSize, pinSizeStep, getMosaicCellIndexFromImage } from './utils';
 
 type BoardStateType = {
     pinShape: PinShape;
     pinSize: number;
-    pinsColors: GridColors | null;
+    mosaicImage: MosaicImage;
 };
 const initialState: BoardStateType = {
     pinShape: 'round',
     pinSize: 30,
-    pinsColors: heartColors,
+    mosaicImage: heartImage,
 };
 
 export const boardSlice = createSlice({
@@ -31,40 +30,7 @@ export const boardSlice = createSlice({
             state.pinSize = newPinSize;
         },
         clearBoard(state: BoardStateType) {
-            const { pinsColors } = state;
-            if (pinsColors === null) {
-                return;
-            }
-            pinsColors.forEach((row) => {
-                row.forEach((cell) => {
-                    cell.color = null;
-                });
-            });
-        },
-
-        resizeBoard(
-            state: BoardStateType,
-            action: PayloadAction<[pinsCountW: number, pinsCountH: number]>,
-        ) {
-            const [pinsCountW, pinsCountH] = action.payload;
-            const { pinsColors } = state;
-            if (pinsColors === null) {
-                return;
-            }
-
-            const resizedPinsColors = [];
-            for (let i = 0; i < pinsCountH; ++i) {
-                const row = [];
-                for (let j = 0; j < pinsCountW; ++j) {
-                    const cell = {
-                        color: pinsColors[i]?.[j]?.color || null,
-                    };
-                    row.push(cell);
-                }
-                resizedPinsColors.push(row);
-            }
-
-            state.pinsColors = resizedPinsColors as GridColors;
+            state.mosaicImage = [];
         },
 
         setPinColor(
@@ -76,80 +42,36 @@ export const boardSlice = createSlice({
             }>,
         ) {
             const { rowIndex, colIndex, color } = action.payload;
-            if (state.pinsColors === null || rowIndex < 0 || colIndex < 0) {
+            if (rowIndex < 0 || colIndex < 0) {
                 return;
             }
 
-            if (state.pinsColors[rowIndex][colIndex].color === color) {
+            const cellIndex = getMosaicCellIndexFromImage(state.mosaicImage, rowIndex, colIndex);
+            const mosaicCell = state.mosaicImage[cellIndex] || null;
+            const oldColor = mosaicCell?.color || null;
+
+            if (oldColor === color) {
                 return;
             }
 
-            state.pinsColors[rowIndex][colIndex] = { color };
-        },
-
-        downloadImage(state: BoardStateType) {
-            const { pinsColors } = state;
-            if (pinsColors === null) {
-                return;
-            }
-
-            let minRowIndex = pinsColors.length;
-            let maxRowIndex = 0;
-            let minColIndex = pinsColors[0].length;
-            let maxColIndex = 0;
-
-            pinsColors.forEach((row, rowInd) => {
-                row.forEach((cell, colInd) => {
-                    if (!cell.color) {
-                        return;
-                    }
-
-                    minRowIndex = rowInd < minRowIndex ? rowInd : minRowIndex;
-                    maxRowIndex = rowInd > maxRowIndex ? rowInd : maxRowIndex;
-                    minColIndex = colInd < minColIndex ? colInd : minColIndex;
-                    maxColIndex = colInd > maxColIndex ? colInd : maxColIndex;
+            if (mosaicCell === null && color !== null) {
+                state.mosaicImage.push({
+                    rowIndex,
+                    colIndex,
+                    color,
                 });
-            });
-
-            const imgPinsCountH = maxRowIndex - minRowIndex + 1;
-            const imgPinsCountW = maxColIndex - minColIndex + 1;
-
-            if (imgPinsCountW <= 0 || imgPinsCountH <= 0) {
                 return;
             }
 
-            let imgPinsColors = pinsColors.slice(minRowIndex, maxRowIndex + 1);
-            imgPinsColors = imgPinsColors.map((row) => row.slice(minColIndex, maxColIndex + 1));
-
-            const mosaic = new Mosaic({
-                pinPadding,
-                pinShape: state.pinShape,
-                pinSize: state.pinSize,
-                pinsCountW: imgPinsCountW,
-                pinsCountH: imgPinsCountH,
-                pinsColors: imgPinsColors,
-                ignoreEmptyCells: true,
-                boardPaddingW: boardPadding,
-                boardPaddingH: boardPadding,
-            });
-
-            const canvas = document.createElement('canvas');
-            canvas.width = mosaic.getBoardWidth();
-            canvas.height = mosaic.getBoardHeight();
-            const ctx = canvas.getContext('2d');
-            if (ctx === null) {
+            if (color === null) {
+                state.mosaicImage.splice(cellIndex, 1);
                 return;
             }
-            mosaic.drawBoard({ ctx });
 
-            const link = document.createElement('a');
-            link.download = 'mosaic.png';
-            link.href = canvas.toDataURL('image/png', 1);
-            link.click();
+            mosaicCell.color = color;
         },
     },
 });
 
-export const { setPinShape, increasePinSize, setPinColor, clearBoard, resizeBoard, downloadImage } =
-    boardSlice.actions;
+export const { setPinShape, increasePinSize, setPinColor, clearBoard } = boardSlice.actions;
 export default boardSlice.reducer;

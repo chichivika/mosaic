@@ -7,7 +7,6 @@ import React, {
     MutableRefObject,
     WheelEvent,
 } from 'react';
-import styled from 'styled-components';
 import Mosaic from './utils/mosaicClass';
 import { PinShape, GridColors } from './utils/mosaicTypes';
 
@@ -39,13 +38,6 @@ type BoardProps = GeneralBoardProps & {
     onMouseMove?: (event: MouseEvent) => void;
     onMouseLeave?: (event: MouseEvent) => void;
 };
-export const StyledBoardCnt = styled.div`
-    display: flex;
-    justify-content: center;
-    canvas {
-        cursor: pointer;
-    }
-`;
 export default function Board({
     pinsCountW,
     pinsCountH,
@@ -127,21 +119,17 @@ export default function Board({
     }, [boardRef, mouseX, mouseY, mosaic]);
 
     return (
-        <StyledBoardCnt>
-            <canvas
-                ref={boardRef}
-                width={mosaic.getBoardWidth()}
-                height={mosaic.getBoardHeight()}
-                onClick={
-                    onClick
-                        ? (event) => _fireClickEvent(event, mosaic, onClick, pinsColors)
-                        : undefined
-                }
-                onMouseMove={onMouseMove}
-                onMouseLeave={onMouseLeave}
-                onWheel={onWheel}
-            />
-        </StyledBoardCnt>
+        <canvas
+            ref={boardRef}
+            width={mosaic.getBoardWidth()}
+            height={mosaic.getBoardHeight()}
+            onClick={
+                onClick ? (event) => _fireClickEvent(event, mosaic, onClick, pinsColors) : undefined
+            }
+            onMouseMove={onMouseMove}
+            onMouseLeave={onMouseLeave}
+            onWheel={onWheel}
+        />
     );
 }
 

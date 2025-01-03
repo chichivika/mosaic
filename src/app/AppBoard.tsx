@@ -1,7 +1,7 @@
-import React, { useEffect, WheelEvent, WheelEventHandler } from 'react';
+import React, { WheelEvent, WheelEventHandler } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { throttle } from 'lodash';
-import { resizeBoard, increasePinSize } from '../redux/board/boardSlice';
+import { increasePinSize } from '../redux/board/boardSlice';
 import {
     selectPinShape,
     selectPinSize,
@@ -19,10 +19,6 @@ export default function AppBoard() {
     const pinShape = useSelector(selectPinShape);
     const pinSize = useSelector(selectPinSize);
     const [pinsCountW, pinsCountH] = useSelector(selectPinsCount);
-
-    useEffect(() => {
-        dispatch(resizeBoard([pinsCountW, pinsCountH]));
-    }, [pinsCountW, pinsCountH, dispatch]);
 
     const handleWheel: WheelEventHandler = throttle((event: WheelEvent) => {
         if (event.ctrlKey) {

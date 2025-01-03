@@ -1,8 +1,14 @@
 import { createSelector } from '@reduxjs/toolkit';
 import { StateType } from '../store';
 import Mosaic from '../../utils/mosaicClass';
-import { PinShape } from '../../utils/mosaicTypes';
-import { availableHeight, availableWidth, pinPadding, boardPadding } from './utils';
+import { GridColors, MosaicImage, PinShape, RowColors } from '../../utils/mosaicTypes';
+import {
+    availableHeight,
+    availableWidth,
+    pinPadding,
+    boardPadding,
+    getMosaicColorFromImage,
+} from './utils';
 
 const selectBoardState = (state: StateType) => state.board;
 
@@ -16,9 +22,9 @@ export function selectPinSize(state: StateType): number {
     return boardState.pinSize;
 }
 
-export function selectPinsColors(state: StateType) {
+export function selectMosaicImage(state: StateType): MosaicImage {
     const boardState = selectBoardState(state);
-    return boardState.pinsColors;
+    return boardState.mosaicImage;
 }
 
 export const selectPinsCount = createSelector([selectPinSize], (pinSize) => {
@@ -34,3 +40,20 @@ export const selectPinsCount = createSelector([selectPinSize], (pinSize) => {
     );
     return [pinsCountW, pinsCountH];
 });
+
+export const selectPinsColors = createSelector(
+    [selectMosaicImage, selectPinsCount],
+    (mosaicImage, [pinsCountW, pinsCountH]) => {
+        const pinsColors = [];
+        for (let i = 0; i < pinsCountH; ++i) {
+            const row: RowColors = [];
+            pinsColors.push(row);
+            for (let j = 0; j < pinsCountW; ++j) {
+                row.push({
+                    color: getMosaicColorFromImage(mosaicImage, i, j),
+                });
+            }
+        }
+        return pinsColors as GridColors;
+    },
+);

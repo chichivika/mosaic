@@ -2,6 +2,13 @@ export type PinShape = 'round' | 'roundGem' | 'square' | 'squareGem';
 export type PinSizeAlias = 'xs' | 's' | 'm' | 'l';
 export type PinColor = string | null;
 
+export type MosaicImageCell = {
+    rowIndex: number;
+    colIndex: number;
+    color: string;
+};
+export type MosaicImage = MosaicImageCell[];
+
 export type PaletteColor = {
     color: string;
 };
