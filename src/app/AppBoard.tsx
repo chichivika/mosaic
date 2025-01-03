@@ -1,7 +1,5 @@
-import React, { WheelEvent, WheelEventHandler } from 'react';
+import React from 'react';
 import { useSelector, useDispatch } from 'react-redux';
-import { throttle } from 'lodash';
-import { increasePinSize } from '../redux/board/boardSlice';
 import {
     selectPinShape,
     selectPinSize,
@@ -19,15 +17,6 @@ export default function AppBoard() {
     const pinShape = useSelector(selectPinShape);
     const pinSize = useSelector(selectPinSize);
     const [pinsCountW, pinsCountH] = useSelector(selectPinsCount);
-
-    const handleWheel: WheelEventHandler = throttle((event: WheelEvent) => {
-        if (event.ctrlKey) {
-            return;
-        }
-        event.preventDefault();
-        const needIncrease = event.deltaY < 0;
-        dispatch(increasePinSize(needIncrease));
-    });
 
     return (
         <HoverBoard
@@ -48,7 +37,6 @@ export default function AppBoard() {
                     }),
                 );
             }}
-            onWheel={handleWheel}
         />
     );
 }
