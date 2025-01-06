@@ -29,6 +29,7 @@ export type GeneralBoardProps = {
     pinsColors?: GridColors | null;
     pinPadding?: number;
     emptyColor?: string;
+    className?: string;
     onClick?: BoardClickCallback;
     onWheel?: (param: WheelEvent) => void;
 };
@@ -49,6 +50,7 @@ export default function Board({
     emptyColor,
     mouseX = null,
     mouseY = null,
+    className,
     onClick,
     onMouseMove,
     onMouseLeave,
@@ -121,6 +123,7 @@ export default function Board({
     return (
         <canvas
             ref={boardRef}
+            className={className}
             width={mosaic.getBoardWidth()}
             height={mosaic.getBoardHeight()}
             onClick={

@@ -1,4 +1,5 @@
 import React from 'react';
+import styled from 'styled-components';
 import { useSelector, useDispatch } from 'react-redux';
 import {
     selectPinShape,
@@ -12,6 +13,9 @@ import { handleMosaicBoardClick } from '../redux/thunk';
 import { AppDispatch } from '../redux/store';
 import { boardPadding, pinPadding } from '../redux/board/utils';
 
+const StyledAppBoard = styled(HoverBoard)`
+    cursor: pointer;
+`;
 export default function AppBoard() {
     const dispatch: AppDispatch = useDispatch();
     const pinShape = useSelector(selectPinShape);
@@ -19,7 +23,8 @@ export default function AppBoard() {
     const [pinsCountW, pinsCountH] = useSelector(selectPinsCount);
 
     return (
-        <HoverBoard
+        <StyledAppBoard
+            className='appBoard'
             pinShape={pinShape}
             pinSize={pinSize}
             boardPadding={boardPadding}
