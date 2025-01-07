@@ -15,7 +15,7 @@ import Pin from './common/Pin';
 import Eraser from './common/Eraser';
 
 const StyledDraggedCnt = styled.div<{ $initialLeft: number; $initialTop: number }>`
-    position: absolute;
+    position: fixed;
     pointer-events: none;
     left: ${(props) => props.$initialLeft}px;
     top: ${(props) => props.$initialTop}px;
@@ -46,9 +46,7 @@ export default function DraggedObject() {
             if (event.clientX === undefined || event.clientY === undefined) {
                 return;
             }
-            const positionLeft = Math.min(event.clientX, document.body.clientWidth - pinSize);
-            const positionTop = Math.min(event.clientY, document.body.clientHeight - pinSize);
-            const newPosition = _getPositionByCursor(positionLeft, positionTop, pinSize);
+            const newPosition = _getPositionByCursor(event.clientX, event.clientY, pinSize);
             pinCnt.style.left = `${newPosition.left}px`;
             pinCnt.style.top = `${newPosition.top}px`;
         },
@@ -97,7 +95,7 @@ export default function DraggedObject() {
 
 function _getPositionByCursor(mouseX: number, mouseY: number, pinSize: number) {
     return {
-        left: mouseX + window.scrollX - pinSize / 2,
-        top: mouseY + window.scrollY - pinSize / 2,
+        left: Math.min(mouseX - pinSize / 2, document.body.clientWidth - pinSize),
+        top: Math.min(mouseY - pinSize / 2, document.body.clientHeight - pinSize),
     };
 }
